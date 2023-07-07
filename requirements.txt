@@ -1,0 +1,4 @@
+colorama
+httpx
+tls_client
+websocket_client
