@@ -2,21 +2,17 @@ import tls_client, random, string, json, websocket, time, os, time
 from t import get_T
 from mail import createEmail, getCode
 from console import console
-
+from tls_client import exceptions as tls_exceptions
 # I know some requests are unnecessary, but there is a 'Set-Cookie' in each request response so i made them optional
 # I haven't tested it with proxies, so I couldn't figure out which requests need proxies. Therefore, I simply used proxies in the register request :D
 
 class kick:
-    def __init__(self, email, password, username, optionalRequests, debug, follow="", proxy="", delay:int=0):
+    def __init__(self, email, password, username, optionalRequests, debug, follow="", proxy="", timeout:int=10, delay:int=0):
+        self.timeout = timeout
         self.delay = delay
         self.proxies = {}
         if proxy:
-            self.proxies = {
-                "proxy": {
-                    "http": f"http://{proxy}",
-                    "https": f"http://{proxy}"
-                }
-            }
+            self.proxies = f"http://{proxy}"
         if "@qwmail.xyz" not in email: raise Exception("Invalid email. The email must be in the format of '@qwmail.xyz'")
         self.debug = debug
         self.optionalRequests = optionalRequests
@@ -49,7 +45,7 @@ class kick:
             "sec-fetch-site": "same-origin",
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
             "x-xsrf-token": self.client.cookies["XSRF-TOKEN"].replace("%3D", "="),
-        }, data=json.dumps({"username":"xQc"})).text
+        }, data=json.dumps({"username":username})).text
         if "already been taken" in checkUsername:
             input(checkUsername)
             raise Exception(f"Username {username} already taken")
@@ -78,6 +74,7 @@ class kick:
     def debugger(self, text, type):
         if self.debug: console.info(text)
     def checkError(self, req):
+        if req.status_code == 429 and "/register" in req.url: raise Exception("Your IP is banned for creating a lot of accounts on the same IP. Change your IP or use proxies.")
         if req.status_code not in [200, 204, 201]:
             try: console.error(f"Error in {req.url} - {req.status_code} - {req.json()}")
             except: console.error(f"Error in {req.url} - {req.status_code}")
@@ -151,7 +148,10 @@ class kick:
             KTP["nameFieldName"]: "",
             KTP["validFromFieldName"]: KTP["encryptedValidFrom"]
         }
-        self.checkError(self.client.post("https://kick.com/register", headers=self.headers, data=json.dumps(data), proxy=self.proxies))
+        try:
+            self.checkError(self.client.post("https://kick.com/register", headers=self.headers, data=json.dumps(data), proxy=self.proxies, timeout_seconds=self.timeout))
+        except tls_exceptions.TLSClientExeption:
+            raise Exception("Probably dead proxy")
         self.updateHeaders()
         # userID = self.checkError(self.client.get("https://kick.com/api/v1/user", headers=self.headers)).json()["id"]
         console.success("Account created!")

@@ -3,14 +3,14 @@
 
 Kick Account generator
 
-
+Don’t forget to ⭐️
 ## Features
 
-- Email-Based Account Creation: `Generating accounts using email addresses from my domain and receive the verification code automatically.`
+- Email-Based Account Creation: `Generating accounts using email addresses from my domain and receive the verification code automatically. (Use it like this: xxx@qwmail.xyz)`
 
 - Saving Generated Accounts: `Saving all generated account details in a JSON file.`
 
-- Customizable Options: `Choose between random or specific usernames for each accountabd Choose whether to use random or specific passwords.`
+- Customizable Options: `Choose between random or specific usernames for each account and Choose whether to use random or specific passwords.`
 
 - Proxy Support
 

@@ -3,6 +3,7 @@ import kick, asyncio, sys, random, string, re
 
 print("\nKick.com account generater - https://github.com/Shiiivx - Discord: 2yv\n\n")
 
+
 accCount = int(input("How many accounts do you want to create? "))
 print("Select how you would like the usernames for the accounts")
 print("[1] Random usernames")
@@ -40,11 +41,21 @@ elif passwordsType == 2:
 else:
     sys.exit("Invalid choice")
 
+
+
+proxiesFile = input("Would you like to use proxies? If not, leave it empty. If yes, enter the proxies file [IP:PORT]: ")
+
+
 def generate(username):
     if not password:
         pw = "".join(random.choice(string.ascii_letters + string.digits) for x in range(8)) + random.choice([char for char in """!@#$%^&*()-=_+|;:",.<>?'"""]) + random.choice(string.digits) # In case the random password is generated without a digit :)
     else: pw = password
-    asyncio.run(kick.kick(email=f"{username}@qwmail.xyz", password=pw, username=username, optionalRequests=False, debug=True).create_account())
+    if proxiesFile:
+        with open(proxiesFile, "r") as f:
+            proxy = random.choice(f.readlines())
+    else: proxy = ""
+    asyncio.run(kick.kick(email=f"{username}@qwmail.xyz", password=pw, username=username, optionalRequests=False, debug=True, proxy=proxy).create_account())
+
 
 
 if usernamesType == 1:
