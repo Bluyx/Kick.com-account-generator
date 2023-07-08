@@ -11,6 +11,7 @@ class kick:
         self.timeout = timeout
         self.delay = delay
         self.proxies = {}
+        self.created = True
         if proxy:
             self.proxies = f"http://{proxy}"
         if "@qwmail.xyz" not in email: raise Exception("Invalid email. The email must be in the format of '@qwmail.xyz'")
@@ -74,8 +75,10 @@ class kick:
     def debugger(self, text, type):
         if self.debug: console.info(text)
     def checkError(self, req):
-        if req.status_code == 429 and "/register" in req.url: raise Exception("Your IP is banned for creating a lot of accounts on the same IP. Change your IP or use proxies.")
+        if "This field format is invalid [password]." in req.text: print("Err")
+        if req.status_code == 429: raise Exception("Your IP is banned for creating a lot of accounts on the same IP. Change your IP or use proxies.")
         if req.status_code not in [200, 204, 201]:
+            self.created = False
             try: console.error(f"Error in {req.url} - {req.status_code} - {req.json()}")
             except: console.error(f"Error in {req.url} - {req.status_code}")
         return req
@@ -119,7 +122,10 @@ class kick:
             self.updateHeaders()
 
         data = json.dumps({"email":self.email})
-        self.checkError(self.client.post("https://kick.com/api/v1/signup/send/email", headers=self.headers, data=data))
+        try:
+            self.checkError(self.client.post("https://kick.com/api/v1/signup/send/email", headers=self.headers, data=data, proxy=self.proxies, timeout_seconds=self.timeout))
+        except tls_exceptions.TLSClientExeption:
+            raise Exception("Probably dead proxy")
         self.updateHeaders()
         self.debugger("Waiting for verification code", "info")
         while True:
@@ -154,26 +160,27 @@ class kick:
             raise Exception("Probably dead proxy")
         self.updateHeaders()
         # userID = self.checkError(self.client.get("https://kick.com/api/v1/user", headers=self.headers)).json()["id"]
-        console.success("Account created!")
-        # if self.follow: # Todo
-        account = {}
-        account["email"] = self.email
-        account["password"] = self.password
-        for key, value in self.client.cookies.items():
-            if len(key) > 35: # Todo
-                account["uniqueToken"] = {"key": key, "value": value}
-            else:
-                account[key] = value
-        if not os.path.exists("accounts.json"):
-            with open("accounts.json", "w") as file:
-                file.write("[]")
-        with open("accounts.json", "r") as file:
-            accounts = json.loads(file.read())
+        if self.created:
+            console.success("Account created!")
+            # if self.follow: # Todo
+            account = {}
+            account["email"] = self.email
+            account["password"] = self.password
+            for key, value in self.client.cookies.items():
+                if len(key) > 35: # Todo
+                    account["uniqueToken"] = {"key": key, "value": value}
+                else:
+                    account[key] = value
+            if not os.path.exists("accounts.json"):
+                with open("accounts.json", "w") as file:
+                    file.write("[]")
+            with open("accounts.json", "r") as file:
+                accounts = json.loads(file.read())
 
-        accounts.append(account)
-        with open("accounts.json", "w") as file:
-            file.write(json.dumps(accounts))
-        self.debugger("Account saved in accounts.json", "success")
+            accounts.append(account)
+            with open("accounts.json", "w") as file:
+                file.write(json.dumps(accounts))
+            self.debugger("Account saved in accounts.json", "success")
         if self.delay:
             console.info(f"Sleeping for {self.delay} (delay)")
             time.sleep(self.delay)

@@ -33,6 +33,7 @@ python main.py
 
 ## Todo List
 
+- Better UI
 - Make it follow channels of the user's choice after each account is created
 - Handle more errors
 
