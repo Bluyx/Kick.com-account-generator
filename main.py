@@ -52,7 +52,7 @@ def generate(username):
     else: pw = password
     if proxiesFile:
         with open(proxiesFile, "r") as f:
-            proxy = random.choice(f.readlines())
+            proxy = random.choice(f.readlines()).strip()
     else: proxy = ""
     asyncio.run(kick.kick(email=f"{username}@qwmail.xyz", password=pw, username=username, optionalRequests=False, debug=True, proxy=proxy).create_account())
 
