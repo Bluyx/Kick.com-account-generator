@@ -1,5 +1,6 @@
 import kick, asyncio, sys, random, string, re
 
+# !!!!!! email must be in "xxxxx@qwmail.xyz" format
 
 print("\nKick.com account generater - https://github.com/Shiiivx - Discord: 2yv\n\n")
 

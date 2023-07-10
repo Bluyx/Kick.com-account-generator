@@ -129,7 +129,7 @@ class kick:
         self.updateHeaders()
         self.debugger("Waiting for verification code", "info")
         while True:
-            code = getCode(self.email)
+            code = getCode("sign up", self.email)
             if code == "No code" or code == "Error":
                 pass
             else:
@@ -162,7 +162,8 @@ class kick:
         # userID = self.checkError(self.client.get("https://kick.com/api/v1/user", headers=self.headers)).json()["id"]
         if self.created:
             console.success("Account created!")
-            # if self.follow: # Todo
+            if self.follow: # Todo
+                self.client
             account = {}
             account["email"] = self.email
             account["password"] = self.password
