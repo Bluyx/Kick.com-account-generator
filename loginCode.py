@@ -18,3 +18,4 @@ def getLoginCode(email): # Email format must be "xxx@qwmail.xyz"
     console.success(f"Got Login Verification code: {code}")
     return code
 
+getLoginCode(input("Email: "))
