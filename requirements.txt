@@ -2,3 +2,5 @@ colorama
 httpx
 tls_client
 websocket_client
+better_profanity
+nltk

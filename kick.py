@@ -7,14 +7,16 @@ from tls_client import exceptions as tls_exceptions
 # I haven't tested it with proxies, so I couldn't figure out which requests need proxies. Therefore, I simply used proxies in the register request :D
 
 class kick:
-    def __init__(self, email, password, username, optionalRequests, debug, follow="", proxy="", timeout:int=10, delay:int=0):
+    def __init__(self, email, password, username, optionalRequests, debug, follow="", proxy="", verifyEmails="y", saveAs:int=1,timeout:int=10, delay:int=0):
+        if "@qwmail.xyz" not in email: raise Exception("Invalid email. The email must be in the format of '@qwmail.xyz'")
         self.timeout = timeout
         self.delay = delay
         self.proxies = {}
         self.created = True
+        self.saveAs = saveAs
+        self.verifyEmails = verifyEmails
         if proxy:
             self.proxies = f"http://{proxy}"
-        if "@qwmail.xyz" not in email: raise Exception("Invalid email. The email must be in the format of '@qwmail.xyz'")
         self.debug = debug
         self.optionalRequests = optionalRequests
         self.follow = follow
@@ -48,12 +50,14 @@ class kick:
             "x-xsrf-token": self.client.cookies["XSRF-TOKEN"].replace("%3D", "="),
         }, data=json.dumps({"username":username})).text
         if "already been taken" in checkUsername:
-            input(checkUsername)
+            # input(checkUsername)
             raise Exception(f"Username {username} already taken")
-        self.email = createEmail(email)
-        if self.email == "Email already registered":
-            raise Exception("Email already registered")
-        self.debugger(f"Email created: {self.email}", "success")
+        if verifyEmails == "y":
+            self.email = createEmail(email.replace("_", "").lower())
+            if self.email == "Email already registered":
+                raise Exception("Email already registered")
+            console.success(f"Email created: {self.email}")
+        else: self.email = email
         self.password = password
         self.username = username
         self.headers = {
@@ -72,7 +76,7 @@ class kick:
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
             "x-xsrf-token": self.client.cookies["XSRF-TOKEN"].replace("%3D", "="),
         }
-    def debugger(self, text, type):
+    def debugger(self, text):
         if self.debug: console.info(text)
     def checkError(self, req):
         if "This field format is invalid [password]." in req.text: print("Err")
@@ -105,12 +109,12 @@ class kick:
             self.checkError(self.client.get("https://kick.com/featured-livestreams/non-following", headers=self.headers))
         ws = websocket.create_connection("wss://ws-us2.pusher.com/app/eb1d5f283081a78b932c?protocol=7&client=js&version=7.6.0&flash=false", header={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"})
         socket_id = json.loads(json.loads(ws.recv())["data"])["socket_id"]
-        self.debugger(f"Got socket_id: {socket_id}", "info")
+        self.debugger(f"Got socket_id: {socket_id}")
         ws.close()
         self.updateHeaders()
         self.headers["x-socket-id"] = socket_id
         KTP = self.checkError(self.client.get("https://kick.com/kick-token-provider", headers=self.headers)).json()
-        self.debugger(f"Got kick token", "info")
+        self.debugger(f"Got kick token")
         self.updateHeaders()
         self.headers["content-type"] = "application/json"
         self.headers["origin"] = "https://kick.com"
@@ -122,25 +126,29 @@ class kick:
             self.updateHeaders()
 
         data = json.dumps({"email":self.email})
-        try:
+        if self.verifyEmails == "y":
+            try:
+                self.checkError(self.client.post("https://kick.com/api/v1/signup/send/email", headers=self.headers, data=data, proxy=self.proxies, timeout_seconds=self.timeout))
+            except tls_exceptions.TLSClientExeption:
+                raise Exception("Probably dead proxy")
+            self.updateHeaders()
+            self.debugger("Waiting for verification code")
+            while True:
+                code = getCode("sign up", self.email)
+                if code == "No code" or code == "Error":
+                    pass
+                else:
+                    break
+                time.sleep(1)
+            console.success(f"Verification code received - {code}")
+            data = json.dumps({"code":code,"email":self.email})
+            self.checkError(self.client.post("https://kick.com/api/v1/signup/verify/code", headers=self.headers, data=data))
+            self.updateHeaders()
+        else:
             self.checkError(self.client.post("https://kick.com/api/v1/signup/send/email", headers=self.headers, data=data, proxy=self.proxies, timeout_seconds=self.timeout))
-        except tls_exceptions.TLSClientExeption:
-            raise Exception("Probably dead proxy")
-        self.updateHeaders()
-        self.debugger("Waiting for verification code", "info")
-        while True:
-            code = getCode("sign up", self.email)
-            if code == "No code" or code == "Error":
-                pass
-            else:
-                break
-            time.sleep(1)
-        self.debugger(f"Verification code received - {code}", "success")
-        data = json.dumps({"code":code,"email":self.email})
-        self.checkError(self.client.post("https://kick.com/api/v1/signup/verify/code", headers=self.headers, data=data))
-        self.updateHeaders()
+            self.updateHeaders()
         data = {
-            "birthdate": f"{str(random.randint(1, 11)).zfill(2)}/{str(random.randint(1, 30)).zfill(2)}/{random.randint(1985, 2004)}", # Todo: DD/MM?
+            "birthdate": f"{str(random.randint(1, 12)).zfill(2)}/{str(random.randint(1, 30)).zfill(2)}/{random.randint(1985, 2003)}", # Todo: DD/MM?
             "username": self.username,
             "email": self.email,
             "cf_captcha_token": "",
@@ -148,7 +156,7 @@ class kick:
             "password_confirmation": self.password,
             "agreed_to_terms": True,
             "newsletter_subscribed": False,
-            "t": await get_T(),
+            "t": "", # await get_T(), # Not required
             "enable_sms_promo": False,
             "enable_sms_security": False,
             KTP["nameFieldName"]: "",
@@ -162,26 +170,33 @@ class kick:
         # userID = self.checkError(self.client.get("https://kick.com/api/v1/user", headers=self.headers)).json()["id"]
         if self.created:
             console.success("Account created!")
-            if self.follow: # Todo
-                self.client
+            # if self.follow: # Todo
             account = {}
             account["email"] = self.email
             account["password"] = self.password
-            for key, value in self.client.cookies.items():
-                if len(key) > 35: # Todo
-                    account["uniqueToken"] = {"key": key, "value": value}
-                else:
-                    account[key] = value
-            if not os.path.exists("accounts.json"):
-                with open("accounts.json", "w") as file:
-                    file.write("[]")
-            with open("accounts.json", "r") as file:
-                accounts = json.loads(file.read())
+            if self.saveAs in [1,2]:
+                if self.saveAs == 1:
+                    for key, value in self.client.cookies.items():
+                        if len(key) > 35: # Todo
+                            account["uniqueToken"] = {"key": key, "value": value}
+                        else:
+                            account[key] = value
+                if not os.path.exists("accounts.json"):
+                    with open("accounts.json", "w") as file:
+                        file.write("[]")
+                with open("accounts.json", "r") as file:
+                    accounts = json.loads(file.read())
+                    accounts.append(account)
+                    with open("accounts.json", "w") as file:
+                        file.write(json.dumps(accounts))
+                console.success("Account saved in accounts.json")
+            else:
+                with open("accounts.txt", "a") as file:
+                    file.write(f"{self.email}:{self.password}\n")
+                console.success("Account saved in accounts.txt")
 
-            accounts.append(account)
-            with open("accounts.json", "w") as file:
-                file.write(json.dumps(accounts))
-            self.debugger("Account saved in accounts.json", "success")
+
+
         if self.delay:
             console.info(f"Sleeping for {self.delay} (delay)")
             time.sleep(self.delay)
