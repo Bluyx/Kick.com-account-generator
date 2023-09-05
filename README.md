@@ -4,10 +4,10 @@ Kick Account generator
 
 Don’t forget to ⭐️
 ## Features
-- Email-Based Account Creation: `With <a href="https://github.com/Bluyx/email-api">email api</a> You can Generate accounts using email addresses from your custom domain and receive the verification code automatically. (Use it like this: xxx@example.com) OR you can use <a href="https://kopeechka.store/?ref=28978">Kopeechka.store</a>`
-- Saving Generated Accounts: `Saving all generated account details in a JSON/TXT file.`
+- Email-Based Account Creation: With <a href="https://github.com/Bluyx/email-api">email api</a> You can Generate accounts using email addresses from your custom domain and receive the verification code automatically. (Use it like this: xxx@example.com) OR you can use <a href="https://kopeechka.store/?ref=28978">Kopeechka.store</a>
+- Saving Generated Accounts: Saving all generated account details in a JSON/TXT file.
 - Realistic usernames
-- Customizable Options: `Choose between realistic, random or specific usernames for each account and Choose whether to use random or specific passwords.`
+- Customizable Options: Choose between realistic, random or specific usernames for each account and Choose whether to use random or specific passwords.
 - Proxy Support
 
 
