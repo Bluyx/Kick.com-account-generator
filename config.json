@@ -1,0 +1,9 @@
+{
+    "kopeechka": {
+        "kopeechkaToken": "800d1b786a2babf42180e6e70b0af740",
+        "domain": "ro.ru"
+    },
+    "apiURL": "http://mail.example.com",
+    "imap": "mail.example.com",
+    "domain": "example.com"
+}

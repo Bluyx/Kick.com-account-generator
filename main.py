@@ -1,9 +1,8 @@
-import kick, asyncio, sys, random, string, re, nltk, pickle, better_profanity
+import kick, asyncio, sys, random, string, re, nltk, pickle, better_profanity, json
 from console import console
 
-# !!!!!! email must be in "xxxxx@qwmail.xyz" format
 
-print("\nKick.com account generater - https://github.com/Shiiivx - Discord: 2yv\n\n")
+print("\nKick.com account generater - https://github.com/Bluyx - Discord: 2yv\n\n")
 
 
 accCount = int(input("How many accounts do you want to create? "))
@@ -40,10 +39,19 @@ if passwordsType == 2:
         sys.exit(console.error("Password is not strong enough. Please make sure your password includes at least one uppercase letter, one lowercase letter, one digit, and one symbol, and is at least 8 characters long."))
 else:
     password = None
-
-
-# verifyEmails = input("kick.com does not require a verified email, so would you like to create email verified accounts or not? [y/n]: ").lower()
-# if verifyEmails not in ["y","n"]: sys.exit(console.error("Invalid choice"))
+config = json.load(open("config.json"))
+# Todo
+print("what emails do you want to use")
+print("[1] kopeechka")
+print("[2] custom domain (https://github.com/Bluyx/email-api)")
+emails = int(input())
+if emails == 1:
+    useKopeechka = True
+    if not config["kopeechka"]["kopeechkaToken"] or not config["kopeechka"]["domain"]: sys.exit(console.error("edit the 'config.json' first"))
+elif emails == 2:
+    useKopeechka = False
+    if not config["apiURL"] or not config["imap"] or not config["domain"]: sys.exit(console.error("edit the 'config.json' first"))
+else: sys.exit(console.error("Invalid choice"))
 
 proxiesFile = input("Would you like to use proxies? If not, leave it empty. If yes, enter the proxies file: ")
 
@@ -53,7 +61,6 @@ print("[2] JSON file without cookies")
 print("[3] Text file [email:password]")
 saveAs = int(input())
 if saveAs not in [1,2,3]: sys.exit(console.error("Invalid choice"))
-
 def generate(username):
     if not password:
         pw = "".join(random.choice(string.ascii_letters + string.digits) for x in range(8)) + random.choice([char for char in """!@#$%^&*()-=_+|;:",.<>?'"""]) + random.choice(string.digits) # In case the random password is generated without a digit :)
@@ -62,7 +69,7 @@ def generate(username):
         with open(proxiesFile, "r") as f:
             proxy = random.choice(f.readlines()).strip()
     else: proxy = ""
-    asyncio.run(kick.kick(email=f"{username}@qwmail.xyz", password=pw, username=username, optionalRequests=False, debug=True, proxy=proxy, verifyEmails="y", saveAs=saveAs).create_account())
+    asyncio.run(kick.kick(useKopeechka=useKopeechka, password=pw, username=username, kopeechkaToken=config["kopeechka"]["kopeechkaToken"], domain=config["kopeechka"]["domain"], apiURL=config["apiURL"], customDomain=config["domain"], imap=config["imap"], optionalRequests=False, debug=True, proxy=proxy, saveAs=saveAs).create_account())
 
 
 

@@ -1,14 +1,16 @@
-from mail import getCode
+from mail import getVerification
 from console import console
-import time
+import time, json
 
 
-# If you try to log into any account, you will probably be asked for a verification code. So here is the function :)
+# If you try to log into any account, you will be asked for a verification code. So here is the function
+# if you used kopeechka.store then you can't get the login verification code
 
-def getLoginCode(email): # Email format must be "xxx@qwmail.xyz"
-    if "@qwmail.xyz" not in email: raise Exception("Invalid email. The email must be in the format of '@qwmail.xyz'")
+config = json.load(open("config.json"))
+
+def getLoginCode(email, password):
     while True:
-        code = getCode("Log In", email)
+        code = getVerification(config["apiURL"], email, password, "ALL", "subject", config["imap"])
         if code == "No code" or code == "Error":
             print(":")
             pass
@@ -18,4 +20,4 @@ def getLoginCode(email): # Email format must be "xxx@qwmail.xyz"
     console.success(f"Got Login Verification code: {code}")
     return code
 
-getLoginCode(input("Email: "))
+getLoginCode(input("Email: "), input("Password: "))
