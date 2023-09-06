@@ -17,8 +17,8 @@ git clone https://github.com/Bluyx/Kick.com-account-generator
 cd Kick.com-account-generator
 pip install -r requirements.txt
 ```
-Edit the `config.json` file
-If you want to use <a href="https://kopeechka.store/?ref=28978">Kopeechka.store</a> then put your token and the mail you want 
+Edit the `config.json` file<br>
+If you want to use <a href="https://kopeechka.store/?ref=28978">Kopeechka.store</a> then put your token and the mail you want<br>
 If you want to use <a href="https://github.com/Bluyx/email-api">Custom domain</a> then put your API URL, imap, emails domain 
 ```bash
 python main.py
