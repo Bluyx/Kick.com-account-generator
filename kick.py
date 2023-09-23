@@ -169,14 +169,14 @@ class kick:
         }
         try:
             if not self.checkError(self.client.post("https://kick.com/register", headers=self.headers, data=json.dumps(data), proxy=self.proxies, timeout_seconds=self.timeout)):
-                print(data)
+                print(data) #Todo
         except tls_exceptions.TLSClientExeption:
             raise Exception("Probably dead proxy")
         self.updateHeaders()
-        # userID = self.checkError(self.client.get("https://kick.com/api/v1/user", headers=self.headers)).json()["id"]
         if self.created:
-            console.success("Account created!")
+            console.success(f"Account created | Username: {self.username}")
             # if self.follow: # Todo
+            self.updateHeaders()
             account = {"cookies": {}}
             account["email"] = self.email
             account["password"] = self.password

@@ -10,8 +10,9 @@ print("Select how you would like the usernames for the accounts")
 print("[1] Realistic usernames")
 print("[2] Random usernames")
 print(f"[3] Choose a name and add numbers from 0 to {accCount} for each username")
+print("[4] Random username from txt file")
 usernamesType = int(input())
-if usernamesType not in [1,2,3]: sys.exit(console.error("Invalid choice"))
+if usernamesType not in [1,2,3, 4]: sys.exit(console.error("Invalid choice"))
 print("Select how you would like the passwords for the accounts")
 print("[1] Random password for each account")
 print("[2] Specific password for all the accounts.")
@@ -120,7 +121,7 @@ elif usernamesType == 2:
         randomUsername = "".join(random.choice(string.ascii_lowercase + string.digits) for x in range(usernameLength))
         generate(randomUsername)
     console.success("Done. Accounts have been generated")
-elif usernamesType == 2:
+elif usernamesType == 3:
     username = input("Enter the username you want: ")
     for acc in range(accCount):
         if len(username) < 3: # Because there is numbers will be added to the username
@@ -128,6 +129,12 @@ elif usernamesType == 2:
         generate(f"{username}{acc}")
     console.success("Done. Accounts have been generated")
     pass
+elif usernamesType == 4:
+    usernamesTxt = input("enter the usernames txt file: ")
+    with open(usernamesTxt, "r") as f:
+        usernames = usernamesTxt.readlines()
+    for acc in range(accCount):
+        generate(random.choice(usernames))
 else:
     sys.exit(console.error("Invalid choice"))
 
