@@ -1,7 +1,7 @@
 {
     "kopeechka": {
         "kopeechkaToken": "",
-        "domain": "ro.ru"
+        "domain": "lenta.ru"
     },
     "apiURL": "http://mail.example.com",
     "imap": "mail.example.com",

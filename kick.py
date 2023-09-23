@@ -62,6 +62,7 @@ class kick:
             self.email = createEmail(apiURL, f"{username}@{customDomain}", password)
             if self.email["message"] == "Email already registered":
                 raise Exception("Email already registered")
+            self.email = self.email["account"]
         console.success(f"Email created: {self.email}")
         self.password = password
         self.username = username
@@ -146,7 +147,8 @@ class kick:
             else:
                 apiURL = json.load(open("config.json"))["apiURL"]
                 code = getVerification(apiURL=apiURL, email=self.email, password=self.password, sender="ALL", verification_location="subject", imap=self.imap)
-                if code == "Message not found":
+                input(code)
+                if code["message"] == "Message not found":
                     pass
                 else: break
             time.sleep(2)
