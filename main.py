@@ -134,7 +134,7 @@ elif usernamesType == 4:
     with open(usernamesTxt, "r") as f:
         usernames = usernamesTxt.readlines()
     for acc in range(accCount):
-        generate(random.choice(usernames))
+        generate(usernames[acc])
 else:
     sys.exit(console.error("Invalid choice"))
 

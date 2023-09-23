@@ -56,6 +56,7 @@ class kick:
             getEmail = getMail(kopeechkaToken, domain)
             self.kopeechkaToken = kopeechkaToken
             self.email = getEmail["mail"]
+            self.emailPassword = getEmail["password"]
             self.mId = getEmail["id"]
         else:
             self.email = createEmail(apiURL, f"{username}@{customDomain}", password)
@@ -143,7 +144,8 @@ class kick:
                     code = bs4.BeautifulSoup(code, 'html.parser').find(string="Please enter the following code to complete sign up:").find_next('div').text.strip()
                     break
             else:
-                code = getVerification(email=self.email, password=self.password, sender="ALL", verification_location="subject", imap=self.imap)
+                apiURL = json.load(open("config.json"))["apiURL"]
+                code = getVerification(apiURL=apiURL, email=self.email, password=self.password, sender="ALL", verification_location="subject", imap=self.imap)
                 if code == "Message not found":
                     pass
                 else: break
