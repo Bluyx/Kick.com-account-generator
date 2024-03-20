@@ -23,7 +23,7 @@ config = json.load(open("config.json"))
 settingsType = int(input())
 if settingsType not in [1,2]: sys.exit(console.error("Invalid choice"))
 if settingsType == 1:
-    settings = json.load(open("config.json"))["settings"]
+    settings = config["settings"]
 else:
     settings = {}
     accCount = int(input("How many accounts do you want to create? "))
