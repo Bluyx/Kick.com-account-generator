@@ -35,7 +35,7 @@ else:
     print("[4] Random username from txt file")
     usernamesType = int(input())
     if usernamesType not in [1,2,3, 4]: sys.exit(console.error("Invalid choice"))
-    settings["UsernamesType"] = usernamesType
+    settings["usernamesType"] = usernamesType
     print("Select how you would like the passwords for the accounts")
     print("[1] Random password for each account")
     print("[2] Specific password for all the accounts.")

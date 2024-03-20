@@ -1,9 +1,9 @@
 {
     "kopeechka": {
-        "kopeechkaToken": "800d1b786a2babf42180e6e70b0af740",
+        "kopeechkaToken": "",
         "domains": ["hotmail.com", "gmail.com"]
     },
-    "salamoonder_apiKey": "sr-egemen-b8c4-5deb-63b9-47f6a725",
+    "salamoonder_apiKey": "",
     "apiURL": "http://mail.example.com",
     "imap": "mail.example.com",
     "domain": "example.com",
