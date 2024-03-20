@@ -1,9 +1,20 @@
 {
     "kopeechka": {
-        "kopeechkaToken": "",
-        "domain": "lenta.ru"
+        "kopeechkaToken": "800d1b786a2babf42180e6e70b0af740",
+        "domains": ["hotmail.com", "gmail.com"]
     },
+    "salamoonder_apiKey": "sr-egemen-b8c4-5deb-63b9-47f6a725",
     "apiURL": "http://mail.example.com",
     "imap": "mail.example.com",
-    "domain": "example.com"
+    "domain": "example.com",
+    "settings": {
+        "follow": ["xqc"],
+        "saveAs": 1,
+        "proxiesFile": "",
+        "AccountsCount": 1,
+        "usernamesType": 1,
+        "passwordsType": 1,
+        "password": null,
+        "emailsType": 1
+    }
 }

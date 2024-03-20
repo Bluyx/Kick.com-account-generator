@@ -1,14 +1,16 @@
-import tls_client, random, string, json, websocket, time, os, time, bs4, sys
+import tls_client, random, json, websocket, time, os, time, bs4, sys
 from t import get_T
 from mail import createEmail, getVerification
 from kopeechka import getMail, getCode
 from console import console
 from tls_client import exceptions as tls_exceptions
-
+from kasada import kasada
+# from testing.k import kasada
 # I know some requests are unnecessary, but there is a 'Set-Cookie' in each request response so i made them optional
-
 class kick:
     def __init__(self, useKopeechka:bool, password, username, kopeechkaToken=None, domain=None, apiURL=None, customDomain=None, imap=None, optionalRequests=False, debug=True, follow="", proxy="", saveAs:int=1, timeout:int=10, delay:int=0):
+        # ja3 = ','.join('-'.join(str(random.randint(0, 65000)) for _ in range(random.randint(3, 6))) for _ in range(3))
+        ja3 = ",".join(["771", "-".join([str(random.randint(0, 255)) for _ in range(150)]), "0-10-11-35-23-65281-13-5-18-16-30032-43", "23-24-25", "0-1-2"])
         self.timeout = timeout
         self.delay = delay
         self.proxies = {}
@@ -21,12 +23,14 @@ class kick:
         self.debug = debug
         self.optionalRequests = optionalRequests # Todo
         self.follow = follow
-        self.client = tls_client.Session(client_identifier="chrome_114", random_tls_extension_order=True, ja3_string="".join(random.choice(string.digits + string.ascii_lowercase) for x in range(500)))
-        self.client.get("https://kick.com/", headers={
+        self.client = tls_client.Session(client_identifier="chrome_122", random_tls_extension_order=True, ja3_string=ja3)#, ja3_string="".join(random.choice(string.digits + string.ascii_lowercase) for x in range(500)))
+        self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        # self.ua = "Mozilla_5_0_Macintosh_Intel_Mac_OS_X_14_1_AppleWebKit_537_36_KHTML_like_Gecko_Chrome_120_0_0_0_Safari_537_36"
+        home = self.client.get("https://kick.com/", headers={
             "authority": "kick.com",
             "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
             "accept-language": "en-US,en;q=0.9,ar;q=0.8",
-            "sec-ch-ua": '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
+            "sec-ch-ua": '"Not.A/Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": '"Windows"',
             "sec-fetch-dest": "document",
@@ -34,8 +38,9 @@ class kick:
             "sec-fetch-site": "none",
             "sec-fetch-user": "?1",
             "upgrade-insecure-requests": "1",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-        })
+            "user-agent": self.ua,
+        }).text
+        self.pjs = "https://kick.com" + bs4.BeautifulSoup(home, "html.parser").find_all("script", {"src": lambda s: s and s.endswith("p.js")})[0]["src"]
         checkUsername = self.client.post("https://kick.com/api/v1/signup/verify/username", headers={
             "authority": "kick.com",
             "accept": "application/json, text/plain, */*",
@@ -47,7 +52,7 @@ class kick:
             "sec-fetch-dest": "empty",
             "sec-fetch-mode": "cors",
             "sec-fetch-site": "same-origin",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+            "user-agent": self.ua,
             "x-xsrf-token": self.client.cookies["XSRF-TOKEN"].replace("%3D", "="),
         }, data=json.dumps({"username":username})).text
         if "already been taken" in checkUsername:
@@ -73,13 +78,13 @@ class kick:
             "authorization": f"Bearer {self.client.cookies['XSRF-TOKEN'].replace('%3D', '=')}",
             "cookie": self.headersCookies(),
             "referer": "https://kick.com/",
-            "sec-ch-ua": '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
+            "sec-ch-ua": '"Chromium";v="120", "Not(A:Brand";v="24", "Google Chrome";v="120"',
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": '"Windows"',
             "sec-fetch-dest": "empty",
             "sec-fetch-mode": "cors",
             "sec-fetch-site": "same-origin",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+            "user-agent": self.ua,
             "x-xsrf-token": self.client.cookies["XSRF-TOKEN"].replace("%3D", "="),
         }
     def debugger(self, text):
@@ -89,8 +94,7 @@ class kick:
         if req.status_code not in [200, 204, 201]:
             self.created = False
             try: console.error(f"Error in {req.url} - {req.status_code} - {req.json()}")
-            except: console.error(f"Error in {req.url} - {req.status_code}")
-            return False
+            except: console.error(f"Error in {req.url} - {req.status_code} - {req.text}")
         return req
     def headersCookies(self):
         # return "; ".join(f"{key}={value}" for key, value in client.cookies.items())
@@ -100,12 +104,12 @@ class kick:
         return headersCookies
 
     def updateHeaders(self):
-        XSRFH = self.client.cookies["XSRF-TOKEN"].replace("%3D", "=")
-        self.headers["authorization"] = f"Bearer {XSRFH}"
+        XSRF = self.client.cookies["XSRF-TOKEN"].replace("%3D", "=")
+        self.headers["authorization"] = f"Bearer {XSRF}"
         self.headers["cookie"] = self.headersCookies()
-        self.headers["x-xsrf-token"] = XSRFH
+        self.headers["x-xsrf-token"] = XSRF
     
-    async def create_account(self):
+    def create_account(self):
         self.updateHeaders()
         if self.optionalRequests:
             self.checkError(self.client.get("https://kick.com/api/v1/user", headers=self.headers))
@@ -113,7 +117,7 @@ class kick:
             self.checkError(self.client.get("https://kick.com/kick-token-provider", headers=self.headers))
             self.updateHeaders()
             self.checkError(self.client.get("https://kick.com/featured-livestreams/non-following", headers=self.headers))
-        ws = websocket.create_connection("wss://ws-us2.pusher.com/app/eb1d5f283081a78b932c?protocol=7&client=js&version=7.6.0&flash=false", header={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"})
+        ws = websocket.create_connection("wss://ws-us2.pusher.com/app/eb1d5f283081a78b932c?protocol=7&client=js&version=7.6.0&flash=false", header={"User-Agent": self.ua})
         socket_id = json.loads(json.loads(ws.recv())["data"])["socket_id"]
         self.debugger(f"Got socket_id: {socket_id}")
         ws.close()
@@ -131,9 +135,48 @@ class kick:
             self.updateHeaders()
 
         try:
-            self.checkError(self.client.post("https://kick.com/api/v1/signup/send/email", headers=self.headers, data=json.dumps({"email":self.email}), proxy=self.proxies, timeout_seconds=self.timeout))
-        except tls_exceptions.TLSClientExeption:
-            raise Exception("Probably dead proxy")
+            console.info("Solving kasada...")
+            solveKasada = kasada(self.pjs)
+            self.headers['x-kpsdk-ct'] = solveKasada["x-kpsdk-ct"]
+            self.headers['x-kpsdk-cd'] = solveKasada["x-kpsdk-cd"]
+            self.headers['x-app-platform'] = 'iOS'
+            self.headers['x-kpsdk-v'] = "j-0.0.0"
+            self.headers['User-Agent'] = self.ua
+            self.headers['x-app-version'] = '39.1.18'
+            XSRF = self.client.cookies["XSRF-TOKEN"].replace("%3D", "=")
+            payload = json.dumps({"email":self.email})
+            headers = {
+                'content-length':str(len(payload)),
+                'sec-ch-ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+                'x-xsrf-token':XSRF,
+                'x-kpsdk-cd': solveKasada["x-kpsdk-cd"],
+                'accept-language':'en-US',
+                'authorization':f'Bearer {XSRF}',
+                'sec-ch-ua-arch':'"x86"',
+                'x-socket-id':socket_id,
+                'sec-ch-ua-platform-version':'"12.0.0"',
+                'sec-ch-ua-full-version-list':'"Chromium";v="122.0.6261.129", "Not(A:Brand";v="24.0.0.0", "Google Chrome";v="122.0.6261.129"',
+                'x-kpsdk-v':'j-0.0.0',
+                'sec-ch-ua-model':'""',
+                'sec-ch-ua-bitness':'"64"',
+                'sec-ch-ua-platform':'"Windows"',
+                'x-kpsdk-ct': solveKasada["x-kpsdk-ct"],
+                'sec-ch-ua-mobile':'?0',
+                'user-agent':self.ua,
+                'content-type':'application/json',
+                'sec-ch-ua-full-version':'"122.0.6261.129"',
+                'accept':'application/json, text/plain, */*',
+                'origin':'https://kick.com',
+                'sec-fetch-site':'same-origin',
+                'sec-fetch-mode':'cors',
+                'sec-fetch-dest':'empty',
+                'referer':'https://kick.com/',
+                'accept-encoding':'gzip, deflate, br, zstd',
+                'cookie': self.headersCookies()
+            }
+            self.checkError(self.client.post('https://kick.com/api/v1/signup/send/email', headers=headers, data=payload, proxy=self.proxies, timeout_seconds=self.timeout))
+        except tls_exceptions.TLSClientExeption as err:
+            raise Exception("Probably dead proxy" + str(err))
         self.updateHeaders()
         self.debugger("Waiting for verification code")
         while True:
@@ -147,43 +190,93 @@ class kick:
             else:
                 apiURL = json.load(open("config.json"))["apiURL"]
                 code = getVerification(apiURL=apiURL, email=self.email, password=self.password, sender="ALL", verification_location="subject", imap=self.imap)
-                input(code)
                 if code["message"] == "Message not found":
                     pass
                 else: break
             time.sleep(2)
         console.success(f"Verification code received - {code}")
+
+        self.headers['x-app-platform'] = 'iOS'
+        self.headers['x-kpsdk-v'] = "j-0.0.0"
+        self.headers['x-app-version'] = '39.1.18'
         data = json.dumps({"code":code,"email":self.email})
         self.checkError(self.client.post("https://kick.com/api/v1/signup/verify/code", headers=self.headers, data=data))
+        console.success(f"Verified Account")
         self.updateHeaders()
+        XSRF = self.client.cookies["XSRF-TOKEN"].replace("%3D", "=")
         data = {
-            "birthdate": f"{str(random.randint(1, 12)).zfill(2)}/{str(random.randint(1, 30)).zfill(2)}/{random.randint(1985, 2003)}", # Todo: DD/MM?
-            "username": self.username,
+            "agreed_to_terms": True,
+            "isMobileRequest": True,
+            "birthdate": f"{str(random.randint(1, 12)).zfill(2)}/{str(random.randint(1, 30)).zfill(2)}/{random.randint(1990, 2003)}",
             "email": self.email,
             "cf_captcha_token": "",
             "password": self.password,
             "password_confirmation": self.password,
-            "agreed_to_terms": True,
-            "newsletter_subscribed": False,
-            "t": "", # await get_T(), # Not required
-            "enable_sms_promo": False,
-            "enable_sms_security": False,
+            "username": self.username,
+            "t": get_T(self.ua),
             KTP["nameFieldName"]: "",
             KTP["validFromFieldName"]: KTP["encryptedValidFrom"]
         }
+        headers = {
+            'content-length':str(len(payload)),
+            'sec-ch-ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+            'x-xsrf-token':XSRF,
+            'accept-language':'en-US',
+            'sec-ch-ua-mobile':'?0',
+            'authorization':f'Bearer {XSRF}',
+            'user-agent':self.ua,
+            'content-type':'application/json',
+            'x-socket-id':socket_id,
+            'accept':'application/json, text/plain, */*',
+            'sec-ch-ua-platform':'"Windows"',
+            'origin':'https://kick.com',
+            'sec-fetch-site':'same-origin',
+            'sec-fetch-mode':'cors',
+            'sec-fetch-dest':'empty',
+            'referer':'https://kick.com/',
+            'accept-encoding':'gzip, deflate, br, zstd',
+            'cookie':self.headersCookies()
+        }
+
         try:
-            if not self.checkError(self.client.post("https://kick.com/register", headers=self.headers, data=json.dumps(data), proxy=self.proxies, timeout_seconds=self.timeout)):
-                print(data) #Todo
+            register = self.checkError(self.client.post("https://kick.com/register", headers=self.headers, data=json.dumps(data), proxy=self.proxies, timeout_seconds=self.timeout))
+            self.token = register.json()["token"]
         except tls_exceptions.TLSClientExeption:
             raise Exception("Probably dead proxy")
+        self.updateHeaders()
+        self.headers["Authorization"] = f"Bearer {self.token}"
+        self.checkError(self.client.get('https://kick.com/emotes/xqc', headers=self.headers)) # Unlock account
         self.updateHeaders()
         if self.created:
             console.success(f"Account created | Username: {self.username}")
             # if self.follow: # Todo
+            #     for follow in self.follow:
+            #         headers = {
+            #             'Host': 'kick.com',
+            #             # 'x-kpsdk-cd': '{"workTime":1710959055731,"id":"7f919661d43664e2448f5214b1a9d608","answers":[2,2],"duration":1,"d":153,"st":1710959006512,"rst":1710959006665}',
+            #             # 'x-kpsdk-ct': '0aqnAak6JwYRt9u15nRGOsWkvecOE4bWWTeUv7un5GEUd4gMWnzi508ekrMM9wp09RsULb6z0ivL3R0ePy0Ytw5rcFB7MszisawORveTiAz4qA1D8kLTjObYZ3NpUM4bhnLlhyCxeVmbsVPhbEcJsfZI9B98ow2wiUCW1nF',
+            #             'Accept': 'application/json, text/plain, */*',
+            #             'Authorization': f'Bearer {self.token}',
+            #             'Sec-Fetch-Site': 'cross-site',
+            #             'x-app-platform': 'iOS',
+            #             'Accept-Language': 'en-US,en;q=0.9',
+            #             'Sec-Fetch-Mode': 'cors',
+            #             'x-kpsdk-v': 'j-0.0.0',
+            #             'Origin': 'https://kick.com',
+            #             'User-Agent': self.ua,
+            #             'x-app-version': '39.1.18',
+            #             'Connection': 'keep-alive',
+            #             'Sec-Fetch-Dest': 'empty',
+            #             'Content-Type': 'application/json',
+            #         }
+
+            #         self.checkError(self.client.post(f'https://kick.com/api/v2/channels/{follow}/follow', headers=headers))
+            #         console.success(f"Followed {follow}")
             self.updateHeaders()
             account = {"cookies": {}}
             account["email"] = self.email
             account["password"] = self.password
+            account["token"] = self.token
             if self.saveAs in [1,2]:
                 if self.saveAs == 1:
                     for key, value in self.client.cookies.items():
@@ -199,7 +292,7 @@ class kick:
                 console.success("Account saved in accounts.json")
             else:
                 with open("accounts.txt", "a") as file:
-                    file.write(f"{self.email}:{self.password}\n")
+                    file.write(f"{self.email}:{self.password}:{self.token}\n")
                 console.success("Account saved in accounts.txt")
         if self.delay:
             console.info(f"Sleeping for {self.delay} (delay)")

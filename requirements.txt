@@ -1,5 +1,6 @@
 colorama
 httpx
+requests
 tls_client
 websocket_client
 better_profanity

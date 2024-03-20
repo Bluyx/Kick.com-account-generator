@@ -1,23 +1,8 @@
-import kick, asyncio, sys, random, string, re, nltk, pickle, better_profanity, json
+import kick, sys, random, string, re, nltk, pickle, better_profanity, json
 from console import console
 
 
 print("\nKick.com account generater - https://github.com/Bluyx - Discord: 2yv\n\n")
-
-
-accCount = int(input("How many accounts do you want to create? "))
-print("Select how you would like the usernames for the accounts")
-print("[1] Realistic usernames")
-print("[2] Random usernames")
-print(f"[3] Choose a name and add numbers from 0 to {accCount} for each username")
-print("[4] Random username from txt file")
-usernamesType = int(input())
-if usernamesType not in [1,2,3, 4]: sys.exit(console.error("Invalid choice"))
-print("Select how you would like the passwords for the accounts")
-print("[1] Random password for each account")
-print("[2] Specific password for all the accounts.")
-passwordsType = int(input())
-if passwordsType not in [1,2]: sys.exit(console.error("Invalid choice"))
 
 def strongPassword(password):
     if not re.search(r'[A-Z]', password):
@@ -31,53 +16,100 @@ def strongPassword(password):
     if len(password) < 8:
         return False
     return True
-
-# followChannel = str(input("Do you want to follow a channel on each account created? If not, leave it empty. If yes, type the channel name: "))
-
-if passwordsType == 2:
-    password = input("Choose a password: ")
-    if not strongPassword(password):
-        sys.exit(console.error("Password is not strong enough. Please make sure your password includes at least one uppercase letter, one lowercase letter, one digit, and one symbol, and is at least 8 characters long."))
-else:
-    password = None
+print("do you want to load settings from config or enter them manually?")
+print("[1] Load settings from config")
+print("[2] Enter settings manually")
 config = json.load(open("config.json"))
-# Todo
-print("what emails do you want to use")
-print("[1] kopeechka")
-print("[2] custom domain (https://github.com/Bluyx/email-api)")
-emails = int(input())
-if emails == 1:
-    useKopeechka = True
-    if not config["kopeechka"]["kopeechkaToken"] or not config["kopeechka"]["domain"]: sys.exit(console.error("edit the 'config.json' first"))
-elif emails == 2:
-    useKopeechka = False
-    if not config["apiURL"] or not config["imap"] or not config["domain"]: sys.exit(console.error("edit the 'config.json' first"))
-else: sys.exit(console.error("Invalid choice"))
+settingsType = int(input())
+if settingsType not in [1,2]: sys.exit(console.error("Invalid choice"))
+if settingsType == 1:
+    settings = json.load(open("config.json"))["settings"]
+else:
+    settings = {}
+    accCount = int(input("How many accounts do you want to create? "))
+    settings["AccountsCount"] = accCount
+    print("Select how you would like the usernames for the accounts")
+    print("[1] Realistic usernames")
+    print("[2] Random usernames")
+    print(f"[3] Choose a name and add numbers from 0 to {accCount} for each username")
+    print("[4] Random username from txt file")
+    usernamesType = int(input())
+    if usernamesType not in [1,2,3, 4]: sys.exit(console.error("Invalid choice"))
+    settings["UsernamesType"] = usernamesType
+    print("Select how you would like the passwords for the accounts")
+    print("[1] Random password for each account")
+    print("[2] Specific password for all the accounts.")
+    passwordsType = int(input())
+    if passwordsType not in [1,2]: sys.exit(console.error("Invalid choice"))
+    followChannels = str(input("Do you want to follow a channel on each account created? If not, leave it empty. If yes, type the channel name: ")).split(" ")
+    settings["follow"] = followChannels
+    if passwordsType == 2:
+        password = input("Choose a password: ")
+        if not strongPassword(password):
+            sys.exit(console.error("Password is not strong enough. Please make sure your password includes at least one uppercase letter, one lowercase letter, one digit, and one symbol, and is at least 8 characters long."))
+    else:
+        password = None
+    settings["passwordsType"] = passwordsType
+    settings["password"] = password
+    # Todo
+    print("what emails do you want to use")
+    print("[1] kopeechka")
+    print("[2] custom domain (https://github.com/Bluyx/email-api)")
+    emails = int(input())
+    if emails == 1:
+        useKopeechka = True
+        if not config["kopeechka"]["kopeechkaToken"] or not config["kopeechka"]["domains"]: sys.exit(console.error("edit the 'config.json' first"))
+    elif emails == 2:
+        useKopeechka = False
+        if not config["apiURL"] or not config["imap"] or not config["domain"]: sys.exit(console.error("edit the 'config.json' first"))
+    else: sys.exit(console.error("Invalid choice"))
+    settings["emailsType"] = emails
 
-proxiesFile = input("Would you like to use proxies? If not, leave it empty. If yes, enter the proxies file: ")
-
-print("How do you want to save the generated accounts?")
-print("[1] JSON file with cookies")
-print("[2] JSON file without cookies")
-print("[3] Text file [email:password]")
-saveAs = int(input())
-if saveAs not in [1,2,3]: sys.exit(console.error("Invalid choice"))
+    proxiesFile = input("Would you like to use proxies? If not, leave it empty. If yes, enter the proxies file: ")
+    settings["proxiesFile"] = proxiesFile
+    print("How do you want to save the generated accounts?")
+    print("[1] JSON file with cookies")
+    print("[2] JSON file without cookies")
+    print("[3] Text file [email:password:token]")
+    saveAs = int(input())
+    if saveAs not in [1,2,3]: sys.exit(console.error("Invalid choice"))
+    settings["saveAs"] = saveAs
+    with open("config.json", "w") as f:
+        json.dump({"settings": settings, "kopeechka": config["kopeechka"], "apiURL": config["apiURL"], "imap": config["imap"], "domain": config["domain"]}, f, indent=4)
+        print("Settings saved to config.json")
 def generate(username):
-    if not password:
+    if settings["passwordsType"] == 1:
         pw = "".join(random.choice(string.ascii_letters + string.digits) for x in range(8)) + random.choice([char for char in """!@#$%^&*()-=_+|;:",.<>?'"""]) + random.choice(string.digits) # In case the random password is generated without a digit :)
-    else: pw = password
-    if proxiesFile:
-        with open(proxiesFile, "r") as f:
+    else: pw = settings["password"]
+    if settings["proxiesFile"]:
+        with open(settings["proxiesFile"], "r") as f:
             proxy = random.choice(f.readlines()).strip()
     else: proxy = ""
-    asyncio.run(kick.kick(useKopeechka=useKopeechka, password=pw, username=username, kopeechkaToken=config["kopeechka"]["kopeechkaToken"], domain=config["kopeechka"]["domain"], apiURL=config["apiURL"], customDomain=config["domain"], imap=config["imap"], optionalRequests=False, debug=True, proxy=proxy, saveAs=saveAs).create_account())
+    useKopeechka = True if settings["emailsType"] == 1 else False
+    kick.kick(
+        useKopeechka=useKopeechka,
+        password=pw,
+        username=username,
+        kopeechkaToken=config["kopeechka"]["kopeechkaToken"],
+        domain=random.choice(config["kopeechka"]["domains"]),
+        apiURL=config["apiURL"],
+        customDomain=config["domain"],
+        imap=config["imap"],
+        optionalRequests=False,
+        debug=True,
+        follow=settings["follow"],
+        proxy=proxy,
+        saveAs=settings["saveAs"]
+        ).create_account()
 
 
 
-if usernamesType == 1:
-    if not nltk.corpus.wordnet.synsets("cat"):
+if settings["usernamesType"] == 1:
+    try:
+        nltk.corpus.wordnet.synsets("cat")
+    except:
         console.info("Downloading WordNet dataset...")
-        nltk.download("wordnet", download_dir="nltk_data")
+        nltk.download("wordnet")
         console.success("WordNet dataset downloaded successfuly")
     def generate_word(pos):
         try:
@@ -105,7 +137,7 @@ if usernamesType == 1:
 
         return random.choice(filtered_words).capitalize()
 
-    for acc in range(accCount):
+    for acc in range(settings["AccountsCount"]):
         underScore = random.choices(["_", ""], [0.2, 0.8])[0]
         if random.choice([True, False]):
             randomUsername = f"{generate_word('adj')}{generate_word('noun')}{str(random.randint(0, 9999))}{underScore}"

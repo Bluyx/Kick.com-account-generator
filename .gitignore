@@ -1,9 +1,9 @@
+__pycache__/
+testing/
+nltk_data/
 accounts.json
 accounts.txt
 adj_list.pkl
 noun_list.pkl
 adj_cache.pkl
 noun_cache.pkl
-__pycache__/
-testing/
-nltk_data/
