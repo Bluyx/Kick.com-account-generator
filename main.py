@@ -51,6 +51,8 @@ else:
         password = None
     settings["passwordsType"] = passwordsType
     settings["password"] = password
+    salamoonder_apiKey = input("Enter your salamoonder.com api key: ")
+
     # Todo
     print("what emails do you want to use")
     print("[1] kopeechka")
@@ -74,6 +76,7 @@ else:
     saveAs = int(input())
     if saveAs not in [1,2,3]: sys.exit(console.error("Invalid choice"))
     settings["saveAs"] = saveAs
+    settings["salamoonder_apiKey"] = salamoonder_apiKey
     with open("config.json", "w") as f:
         json.dump({"settings": settings, "kopeechka": config["kopeechka"], "apiURL": config["apiURL"], "imap": config["imap"], "domain": config["domain"]}, f, indent=4)
         print("Settings saved to config.json")
