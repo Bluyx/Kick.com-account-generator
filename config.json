@@ -10,7 +10,7 @@
     "settings": {
         "follow": ["xqc"],
         "saveAs": 3,
-        "proxiesFile": "proxies.txt",
+        "proxiesFile": "",
         "AccountsCount": 1,
         "usernamesType": 1,
         "passwordsType": 1,
