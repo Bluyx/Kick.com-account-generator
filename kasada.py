@@ -7,16 +7,22 @@ def kasada(pjs):
         "Host": "salamoonder.com",
         "Content-Type": "application/json"
     }
+
     createTask = httpx.post("https://salamoonder.com/api/createTask",headers=headers, data=json.dumps({
         "api_key": apiKey,
         "task": {
             "type": "KasadaCaptchaSolver",
             "pjs": pjs
         }
-    }), timeout=50000).json()
-    if createTask["error_description"] == "Invalid API key.":
+    }), timeout=50000)
+    if "1 second" in createTask.text:
+        time.sleep(1)
+        return kasada(pjs)
+    if createTask.json()["error_description"] == "Invalid API key.":
         sys.exit(console.error("Invalid salamoonder.com api key"))
-    taskId = createTask["taskId"]
+    taskId = createTask.json()["taskId"]
+    if not taskId:
+        sys.exit(console.error("Failed to create task"))
     while True:
         res = httpx.post("https://salamoonder.com/api/getTaskResult", headers=headers, data=json.dumps({"api_key": apiKey, "taskId": taskId}), timeout=50000).json()
         if res["status"] == "ready":

@@ -6,6 +6,7 @@ Don’t forget to ⭐️
 - Fully based on Requests
 - Threads support
 - Proxy Support
+- Follow channels on each account created (requires proxies)
 - Email-Based Account Creation: With <a href="https://github.com/Bluyx/email-api">email api</a> You can Generate accounts using email addresses from your custom domain and receive the verification code automatically. (Use it like this: xxx@example.com) OR you can use <a href="https://kopeechka.store/?ref=28978">Kopeechka.store</a>
 - Saving Generated Accounts: Saving all generated account details in a JSON/TXT file.
 - Realistic usernames

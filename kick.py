@@ -7,9 +7,8 @@ from kasada import kasada
 # from testing.k import kasada
 # I know some requests are unnecessary, but there is a 'Set-Cookie' in each request response so i made them optional
 class kick:
-    def __init__(self, useKopeechka:bool, password, username, kopeechkaToken=None, domain=None, apiURL=None, customDomain=None, imap=None, optionalRequests=False, debug=True, follow="", proxy="", saveAs:int=1, timeout:int=10, delay:int=0):
+    def __init__(self, useKopeechka:bool, password, username, kopeechkaToken=None, domain=None, apiURL=None, customDomain=None, imap=None, optionalRequests=False, debug=True, follow="", proxies="", saveAs:int=1, timeout:int=10, delay:int=0):
         # ja3 = ','.join('-'.join(str(random.randint(0, 65000)) for _ in range(random.randint(3, 6))) for _ in range(3))
-        ja3 = ",".join(["771", "-".join([str(random.randint(0, 255)) for _ in range(150)]), "0-10-11-35-23-65281-13-5-18-16-30032-43", "23-24-25", "0-1-2"])
         self.timeout = timeout
         self.delay = delay
         self.proxies = {}
@@ -17,12 +16,12 @@ class kick:
         self.saveAs = saveAs
         self.useKopeechka = useKopeechka
         self.imap = imap
-        if proxy:
-            self.proxies = f"http://{proxy}"
+        if proxies:
+            self.proxies = f"http://{random.choice(proxies).strip()}"
         self.debug = debug
         self.optionalRequests = optionalRequests # Todo
         self.follow = follow
-        self.client = tls_client.Session(client_identifier="chrome_122", random_tls_extension_order=True, ja3_string=ja3)#, ja3_string="".join(random.choice(string.digits + string.ascii_lowercase) for x in range(500)))
+        self.client = tls_client.Session(client_identifier="chrome_122", random_tls_extension_order=True, ja3_string=",".join(["771", "-".join([str(random.randint(0, 255)) for _ in range(150)]), "0-10-11-35-23-65281-13-5-18-16-30032-43", "23-24-25", "0-1-2"]))#, ja3_string="".join(random.choice(string.digits + string.ascii_lowercase) for x in range(500)))
         self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
         # self.ua = "Mozilla_5_0_Macintosh_Intel_Mac_OS_X_14_1_AppleWebKit_537_36_KHTML_like_Gecko_Chrome_120_0_0_0_Safari_537_36"
         home = self.client.get("https://kick.com/", headers={
@@ -90,8 +89,9 @@ class kick:
     def debugger(self, text):
         if self.debug: console.info(text)
     def checkError(self, req):
-        print(req.url + " - " + str(req.status_code))
-        if req.status_code == 429: raise sys.exit(console.error("Your IP is banned for creating a lot of accounts on the same IP. Change your IP or use proxies."))
+        if req.status_code == 429:
+            print(req.url)
+            sys.exit(console.error("Your IP is banned for creating a lot of accounts on the same IP. Change your IP or use proxies."))
         if req.status_code not in [200, 204, 201]:
             self.created = False
             if "The username has already been taken" in req.text:
@@ -138,52 +138,57 @@ class kick:
             self.checkError(self.client.post("https://kick.com/api/v1/signup/verify/username", headers=self.headers, data={"username":self.username}))
             self.updateHeaders()
 
+        console.info("Solving kasada...")
+        solveKasada = kasada(self.pjs)
+        self.headers['x-kpsdk-ct'] = solveKasada["x-kpsdk-ct"]
+        self.headers['x-kpsdk-cd'] = solveKasada["x-kpsdk-cd"]
+        self.headers['x-app-platform'] = 'iOS'
+        self.headers['x-kpsdk-v'] = "j-0.0.0"
+        self.headers['User-Agent'] = self.ua
+        self.headers['x-app-version'] = '39.1.18'
+        XSRF = self.client.cookies["XSRF-TOKEN"].replace("%3D", "=")
+        payload = json.dumps({"email":self.email})
+        headers = {
+            'content-length':str(len(payload)),
+            'sec-ch-ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+            'x-xsrf-token':XSRF,
+            'x-kpsdk-cd': solveKasada["x-kpsdk-cd"],
+            'accept-language':'en-US',
+            'authorization':f'Bearer {XSRF}',
+            'sec-ch-ua-arch':'"x86"',
+            'x-socket-id':socket_id,
+            'sec-ch-ua-platform-version':'"12.0.0"',
+            'sec-ch-ua-full-version-list':'"Chromium";v="122.0.6261.129", "Not(A:Brand";v="24.0.0.0", "Google Chrome";v="122.0.6261.129"',
+            'x-kpsdk-v':'j-0.0.0',
+            'sec-ch-ua-model':'""',
+            'sec-ch-ua-bitness':'"64"',
+            'sec-ch-ua-platform':'"Windows"',
+            'x-kpsdk-ct': solveKasada["x-kpsdk-ct"],
+            'sec-ch-ua-mobile':'?0',
+            'user-agent':self.ua,
+            'content-type':'application/json',
+            'sec-ch-ua-full-version':'"122.0.6261.129"',
+            'accept':'application/json, text/plain, */*',
+            'origin':'https://kick.com',
+            'sec-fetch-site':'same-origin',
+            'sec-fetch-mode':'cors',
+            'sec-fetch-dest':'empty',
+            'referer':'https://kick.com/',
+            'accept-encoding':'gzip, deflate, br, zstd',
+            'cookie': self.headersCookies()
+        }
         try:
-            console.info("Solving kasada...")
-            solveKasada = kasada(self.pjs)
-            self.headers['x-kpsdk-ct'] = solveKasada["x-kpsdk-ct"]
-            self.headers['x-kpsdk-cd'] = solveKasada["x-kpsdk-cd"]
-            self.headers['x-app-platform'] = 'iOS'
-            self.headers['x-kpsdk-v'] = "j-0.0.0"
-            self.headers['User-Agent'] = self.ua
-            self.headers['x-app-version'] = '39.1.18'
-            XSRF = self.client.cookies["XSRF-TOKEN"].replace("%3D", "=")
-            payload = json.dumps({"email":self.email})
-            headers = {
-                'content-length':str(len(payload)),
-                'sec-ch-ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
-                'x-xsrf-token':XSRF,
-                'x-kpsdk-cd': solveKasada["x-kpsdk-cd"],
-                'accept-language':'en-US',
-                'authorization':f'Bearer {XSRF}',
-                'sec-ch-ua-arch':'"x86"',
-                'x-socket-id':socket_id,
-                'sec-ch-ua-platform-version':'"12.0.0"',
-                'sec-ch-ua-full-version-list':'"Chromium";v="122.0.6261.129", "Not(A:Brand";v="24.0.0.0", "Google Chrome";v="122.0.6261.129"',
-                'x-kpsdk-v':'j-0.0.0',
-                'sec-ch-ua-model':'""',
-                'sec-ch-ua-bitness':'"64"',
-                'sec-ch-ua-platform':'"Windows"',
-                'x-kpsdk-ct': solveKasada["x-kpsdk-ct"],
-                'sec-ch-ua-mobile':'?0',
-                'user-agent':self.ua,
-                'content-type':'application/json',
-                'sec-ch-ua-full-version':'"122.0.6261.129"',
-                'accept':'application/json, text/plain, */*',
-                'origin':'https://kick.com',
-                'sec-fetch-site':'same-origin',
-                'sec-fetch-mode':'cors',
-                'sec-fetch-dest':'empty',
-                'referer':'https://kick.com/',
-                'accept-encoding':'gzip, deflate, br, zstd',
-                'cookie': self.headersCookies()
-            }
             sendCode = self.checkError(self.client.post('https://kick.com/api/v1/signup/send/email', headers=headers, data=payload, proxy=self.proxies, timeout_seconds=self.timeout))
-            if "Browser" in sendCode.text:
-                input(sendCode.json())
-                raise Exception("Kasada failed")
+            if "The browser is not supported" in sendCode.text:
+                while True:
+                    self.newClient = tls_client.Session(client_identifier="chrome_122", random_tls_extension_order=True, ja3_string=",".join(["771", "-".join([str(random.randint(0, 255)) for _ in range(150)]), "0-10-11-35-23-65281-13-5-18-16-30032-43", "23-24-25", "0-1-2"]))
+                    sendCode = self.checkError(self.newClient.post('https://kick.com/api/v1/signup/send/email', headers=headers, data=payload, proxy=self.proxies, timeout_seconds=self.timeout))
+                    if sendCode.status_code == 200:
+                        self.newClient.cookies.update(self.client.cookies)
+                        self.client = self.newClient
+                        break
         except tls_exceptions.TLSClientExeption as err:
-            raise Exception("Probably dead proxy" + str(err))
+            sys.exit(console.error("Probably dead proxy" + str(err)))
         self.updateHeaders()
         self.debugger("Waiting for verification code")
         while True:
@@ -248,9 +253,9 @@ class kick:
         try:
             register = self.checkError(self.client.post("https://kick.com/register", headers=self.headers, data=json.dumps(data), proxy=self.proxies, timeout_seconds=self.timeout))
             if register.status_code != 200:
-                if register.json()["errors"]:
-                    input(register.json())
-                    input(data)
+                # if register.json()["errors"]:
+                #     input(register.json())
+                #     input(data)
                 if register.json()["errors"]["username"][0] == "The username has already been taken":
                     self.username = self.username + str(random.randint(100, 9999))
                     data["username"] = self.username
@@ -261,8 +266,8 @@ class kick:
             self.token = register.json()["token"]
             self.created = True
             console.success(f"Account registered | Token: {self.token}")
-        except tls_exceptions.TLSClientExeption:
-            raise Exception("Probably dead proxy")
+        except tls_exceptions.TLSClientExeption as err:
+            sys.exit(console.error("Probably dead proxy" + str(err)))
         self.updateHeaders()
         self.headers["Authorization"] = f"Bearer {self.token}"
         self.checkError(self.client.get('https://kick.com/emotes/xqc', headers=self.headers)) # Unlock account
@@ -292,9 +297,11 @@ class kick:
                         'Content-Type': 'application/json',
                         'cookie': self.headersCookies()
                     }
-
-                    self.checkError(self.client.post(f'https://kick.com/api/v2/channels/{follow}/follow', headers=headers, proxy=self.proxies, timeout_seconds=self.timeout))
-                    console.success(f"Followed {follow}")
+                    try:
+                        self.checkError(self.client.post(f'https://kick.com/api/v2/channels/{follow}/follow', headers=headers, proxy=self.proxies, timeout_seconds=self.timeout))
+                        console.success(f"Followed {follow}")
+                    except tls_exceptions.TLSClientExeption as err:
+                        sys.exit(console.error("Probably dead proxy" + str(err)))
             self.updateHeaders()
             account = {"cookies": {}}
             account["email"] = self.email

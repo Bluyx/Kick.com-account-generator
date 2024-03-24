@@ -1,16 +1,16 @@
 {
     "kopeechka": {
-        "kopeechkaToken": "5da6ffd02155cc86d0676735f5297be8",
+        "kopeechkaToken": "",
         "domains": ["hotmail.com", "gmail.com"]
     },
-    "salamoonder_apiKey": "sr-egemen-26e6-f854-6219-4eed9de4",
+    "salamoonder_apiKey": "",
     "apiURL": "http://mail.example.com",
     "imap": "mail.example.com",
     "domain": "example.com",
     "settings": {
         "follow": ["xqc"],
         "saveAs": 3,
-        "proxiesFile": "",
+        "proxiesFile": "proxies.txt",
         "AccountsCount": 1,
         "usernamesType": 1,
         "passwordsType": 1,

@@ -9,3 +9,4 @@ adj_cache.pkl
 noun_cache.pkl
 verb_cache.pkl
 verb_list.pkl
+proxies.txt
