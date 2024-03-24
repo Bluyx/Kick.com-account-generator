@@ -1,6 +1,5 @@
 from mail import getVerification
-from console import console
-import time, json
+import time, json, console
 
 
 # If you try to log into any account, you will be asked for a verification code. So here is the function

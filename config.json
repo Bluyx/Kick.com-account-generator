@@ -1,20 +1,21 @@
 {
     "kopeechka": {
-        "kopeechkaToken": "",
+        "kopeechkaToken": "5da6ffd02155cc86d0676735f5297be8",
         "domains": ["hotmail.com", "gmail.com"]
     },
-    "salamoonder_apiKey": "",
+    "salamoonder_apiKey": "sr-egemen-26e6-f854-6219-4eed9de4",
     "apiURL": "http://mail.example.com",
     "imap": "mail.example.com",
     "domain": "example.com",
     "settings": {
         "follow": ["xqc"],
-        "saveAs": 1,
+        "saveAs": 3,
         "proxiesFile": "",
         "AccountsCount": 1,
         "usernamesType": 1,
         "passwordsType": 1,
         "password": null,
-        "emailsType": 1
+        "emailsType": 1,
+        "threads": 1
     }
 }

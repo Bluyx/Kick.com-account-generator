@@ -1,4 +1,4 @@
-import httpx, json, time
+import httpx, json, time, sys, console
 
 apiKey = json.load(open("config.json"))["salamoonder_apiKey"]
 
@@ -7,13 +7,16 @@ def kasada(pjs):
         "Host": "salamoonder.com",
         "Content-Type": "application/json"
     }
-    taskId = httpx.post("https://salamoonder.com/api/createTask",headers=headers, data=json.dumps({
+    createTask = httpx.post("https://salamoonder.com/api/createTask",headers=headers, data=json.dumps({
         "api_key": apiKey,
         "task": {
             "type": "KasadaCaptchaSolver",
             "pjs": pjs
         }
-    }), timeout=50000).json()["taskId"]
+    }), timeout=50000).json()
+    if createTask["error_description"] == "Invalid API key.":
+        sys.exit(console.error("Invalid salamoonder.com api key"))
+    taskId = createTask["taskId"]
     while True:
         res = httpx.post("https://salamoonder.com/api/getTaskResult", headers=headers, data=json.dumps({"api_key": apiKey, "taskId": taskId}), timeout=50000).json()
         if res["status"] == "ready":

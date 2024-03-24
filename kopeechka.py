@@ -1,4 +1,4 @@
-import httpx
+import httpx, sys, console
 
 
 def getMail(token, domain):
@@ -6,6 +6,8 @@ def getMail(token, domain):
     if req["status"] == "OK":
         return req
     elif req["status"] == "ERROR":
+        if req["value"] == "BAD_TOKEN":
+            sys.exit(console.error("Invalid kopeechka api key"))
         raise Exception(req["value"])
 
 def getCode(token, id):
