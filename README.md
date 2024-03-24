@@ -12,6 +12,7 @@ Don’t forget to ⭐️
 - Customizable Options: Choose between realistic, random or specific usernames for each account and Choose whether to use random or specific passwords.
 
 🔴 You might still get the 'The browser is not supported.' error
+
 🔴 Following channels after each account is created might not work
 ## Requirements
 - Emails using <a href="https://kopeechka.store/?ref=28978">Kopeechka.store</a> or <a href="https://github.com/Bluyx/email-api">email api</a>
