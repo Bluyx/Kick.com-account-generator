@@ -36,4 +36,4 @@ def salamoonder(pjs):
 def kasada(pjs, path="/api/v1/signup/send/email"):
     return httpx.post("http://127.0.0.1:3033/solve", headers={'Content-Type': 'application/json'}, json={"pjs": pjs, "path": path}, timeout=15000, follow_redirects=True).json()
 
-print(kasada("https://kick.com/149e9513-01fa-4fb0-aad4-566afd725d1b/2d206a39-8ed7-437e-a3be-862e0f06eea3/p.js"))
+# print(kasada("https://kick.com/149e9513-01fa-4fb0-aad4-566afd725d1b/2d206a39-8ed7-437e-a3be-862e0f06eea3/p.js"))
