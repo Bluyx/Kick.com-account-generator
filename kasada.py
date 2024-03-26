@@ -16,8 +16,9 @@ def salamoonder(pjs):
         }
     }), timeout=50000)
     if "1 second" in createTask.text:
+        input(createTask.text)
         time.sleep(1)
-        return kasada(pjs)
+        return salamoonder(pjs)
     if createTask.json()["error_description"] == "Invalid API key.":
         sys.exit(console.error("Invalid salamoonder.com api key"))
     taskId = createTask.json()["taskId"]
@@ -26,11 +27,10 @@ def salamoonder(pjs):
     while True:
         res = httpx.post("https://salamoonder.com/api/getTaskResult", headers=headers, data=json.dumps({"api_key": apiKey, "taskId": taskId}), timeout=50000).json()
         if res["status"] == "ready":
-            if "This website is not officially supported by Salamoonder" in res["solution"]["error"]:
+            if "error" in res["solution"] and "This website is not officially supported by Salamoonder" in res["solution"]["error"]:
                 sys.exit(console.error("Kick.com is disabled by Salamoonder, wait for an update."))
             return res["solution"]
         time.sleep(1)
-
 # Using https://github.com/0x6a69616e/kpsdk-solver (doesn't work)
 
 def kasada(pjs, path="/api/v1/signup/send/email"):

@@ -59,8 +59,7 @@ else:
     emails = int(input())
     if emails == 1:
         useKopeechka = True
-        if not config["kopeechka"]["kopeechkaToken"] or not config["kopeechka"]["domains"]:
-            config["kopeechka"]["kopeechkaToken"] = input("Enter your kopeechka.store api key: ")
+        config["kopeechka"]["kopeechkaToken"] = input("Enter your kopeechka.store api key: ")
     elif emails == 2:
         useKopeechka = False
         if not config["apiURL"] or not config["imap"] or not config["domain"]: sys.exit(console.error("edit the 'config.json' first"))

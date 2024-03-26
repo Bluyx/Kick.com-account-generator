@@ -140,7 +140,7 @@ class kick:
 
         console.info("Solving kasada...")
         solveKasada = salamoonder(self.pjs)
-        solveKasada = kasada(self.pjs, "/api/v1/signup/send/email")
+        # solveKasada = kasada(self.pjs, "/api/v1/signup/send/email")
         XSRF = self.client.cookies["XSRF-TOKEN"].replace("%3D", "=")
         payload = json.dumps({"email":self.email})
         headers = {
