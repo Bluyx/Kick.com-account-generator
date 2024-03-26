@@ -8,7 +8,7 @@
         "passwordsType": 1,
         "password": null,
         "emailsType": 1,
-        "proxiesFile": "proxies.txt",
+        "proxiesFile": "",
         "threads": 1,
         "saveAs": 3
     },
