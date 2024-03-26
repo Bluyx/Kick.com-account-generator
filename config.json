@@ -1,21 +1,26 @@
 {
+    "settings": {
+        "AccountsCount": 1,
+        "usernamesType": 1,
+        "follow": [
+            "xqc"
+        ],
+        "passwordsType": 1,
+        "password": null,
+        "emailsType": 1,
+        "proxiesFile": "proxies.txt",
+        "threads": 1,
+        "saveAs": 3
+    },
     "kopeechka": {
         "kopeechkaToken": "",
-        "domains": ["hotmail.com", "gmail.com"]
+        "domains": [
+            "hotmail.com",
+            "outlook.com"
+        ]
     },
     "salamoonder_apiKey": "",
     "apiURL": "http://mail.example.com",
     "imap": "mail.example.com",
-    "domain": "example.com",
-    "settings": {
-        "follow": ["xqc"],
-        "saveAs": 3,
-        "proxiesFile": "",
-        "AccountsCount": 1,
-        "usernamesType": 1,
-        "passwordsType": 1,
-        "password": null,
-        "emailsType": 1,
-        "threads": 1
-    }
+    "domain": "example.com"
 }

@@ -59,7 +59,8 @@ else:
     emails = int(input())
     if emails == 1:
         useKopeechka = True
-        if not config["kopeechka"]["kopeechkaToken"] or not config["kopeechka"]["domains"]: sys.exit(console.error("add Kopeechka api key to the 'config.json' first"))
+        if not config["kopeechka"]["kopeechkaToken"] or not config["kopeechka"]["domains"]:
+            config["kopeechka"]["kopeechkaToken"] = input("Enter your kopeechka.store api key: ")
     elif emails == 2:
         useKopeechka = False
         if not config["apiURL"] or not config["imap"] or not config["domain"]: sys.exit(console.error("edit the 'config.json' first"))
@@ -78,9 +79,8 @@ else:
     threads = int(input())
     settings["threads"] = threads
     settings["saveAs"] = saveAs
-    config["salamoonder_apiKey"] = salamoonder_apiKey
     with open("config.json", "w") as f:
-        json.dump({"settings": settings, "kopeechka": config["kopeechka"], "apiURL": config["apiURL"], "imap": config["imap"], "domain": config["domain"]}, f, indent=4)
+        json.dump({"settings": settings, "kopeechka": config["kopeechka"], "salamoonder_apiKey": salamoonder_apiKey, "apiURL": config["apiURL"], "imap": config["imap"], "domain": config["domain"]}, f, indent=4)
         print("Settings saved to config.json")
 def generate(username):
     if settings["passwordsType"] == 1:

@@ -3,7 +3,7 @@ from t import get_T
 from mail import createEmail, getVerification
 from kopeechka import getMail, getCode
 from tls_client import exceptions as tls_exceptions
-from kasada import kasada
+from kasada import kasada, salamoonder
 # from testing.k import kasada
 # I know some requests are unnecessary, but there is a 'Set-Cookie' in each request response so i made them optional
 class kick:
@@ -139,13 +139,8 @@ class kick:
             self.updateHeaders()
 
         console.info("Solving kasada...")
-        solveKasada = kasada(self.pjs)
-        self.headers['x-kpsdk-ct'] = solveKasada["x-kpsdk-ct"]
-        self.headers['x-kpsdk-cd'] = solveKasada["x-kpsdk-cd"]
-        self.headers['x-app-platform'] = 'iOS'
-        self.headers['x-kpsdk-v'] = "j-0.0.0"
-        self.headers['User-Agent'] = self.ua
-        self.headers['x-app-version'] = '39.1.18'
+        solveKasada = salamoonder(self.pjs)
+        solveKasada = kasada(self.pjs, "/api/v1/signup/send/email")
         XSRF = self.client.cookies["XSRF-TOKEN"].replace("%3D", "=")
         payload = json.dumps({"email":self.email})
         headers = {
@@ -276,7 +271,8 @@ class kick:
             console.success(f"Account created | Username: {self.username}")
             if self.follow: # Todo
                 for follow in self.follow:
-                    solveKasada = kasada(self.pjs)
+                    solveKasada = salamoonder(self.pjs)
+                    # solveKasada = kasada(self.pjs, f"/api/v2/channels/{follow}/follow")
                     headers = {
                         'Host': 'kick.com',
                         'x-kpsdk-cd': solveKasada["x-kpsdk-cd"],
