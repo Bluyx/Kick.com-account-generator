@@ -8,7 +8,6 @@ from kasada import kasada, salamoonder
 # I know some requests are unnecessary, but there is a 'Set-Cookie' in each request response so i made them optional
 class kick:
     def __init__(self, useKopeechka:bool, password, username, kopeechkaToken=None, domain=None, apiURL=None, customDomain=None, imap=None, optionalRequests=False, debug=True, follow="", proxies="", saveAs:int=1, timeout:int=10, delay:int=0):
-        # ja3 = ','.join('-'.join(str(random.randint(0, 65000)) for _ in range(random.randint(3, 6))) for _ in range(3))
         self.timeout = timeout
         self.delay = delay
         self.proxies = {}
@@ -16,12 +15,17 @@ class kick:
         self.saveAs = saveAs
         self.useKopeechka = useKopeechka
         self.imap = imap
+        self.useSalamoonder = True
         if proxies:
             self.proxies = f"http://{random.choice(proxies).strip()}"
         self.debug = debug
         self.optionalRequests = optionalRequests # Todo
         self.follow = follow
-        self.client = tls_client.Session(client_identifier="chrome_122", random_tls_extension_order=True, ja3_string=",".join(["771", "-".join([str(random.randint(0, 255)) for _ in range(150)]), "0-10-11-35-23-65281-13-5-18-16-30032-43", "23-24-25", "0-1-2"]))#, ja3_string="".join(random.choice(string.digits + string.ascii_lowercase) for x in range(500)))
+        self.client = tls_client.Session(
+            client_identifier="chrome_122",
+            random_tls_extension_order=True,
+            ja3_string=",".join(["772", "-".join([str(random.randint(50, 52392)) for _ in range(15)]), "-".join("45-16-23-65281-35-65037-51-10-43-13-17513-5-0-11-18-27".split("-")), "29-23-24,0"])
+        )
         self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
         # self.ua = "Mozilla_5_0_Macintosh_Intel_Mac_OS_X_14_1_AppleWebKit_537_36_KHTML_like_Gecko_Chrome_120_0_0_0_Safari_537_36"
         home = self.client.get("https://kick.com/", headers={
@@ -105,7 +109,7 @@ class kick:
         headersCookies = ""
         for name, value in self.client.cookies.items():
             headersCookies = headersCookies + f"{name}={value}; "
-        return headersCookies
+        return headersCookies[:-1]
 
     def updateHeaders(self):
         XSRF = self.client.cookies["XSRF-TOKEN"].replace("%3D", "=")
@@ -139,10 +143,46 @@ class kick:
             self.updateHeaders()
 
         console.info("Solving kasada...")
-        solveKasada = salamoonder(self.pjs)
-        # solveKasada = kasada(self.pjs, "/api/v1/signup/send/email")
+        if self.useSalamoonder:
+            solveKasada = salamoonder(self.pjs)
+        else:
+            solveKasada = kasada(self.pjs, "/api/v1/signup/send/email")
         XSRF = self.client.cookies["XSRF-TOKEN"].replace("%3D", "=")
         payload = json.dumps({"email":self.email})
+        # headers = {
+        #     'authority': 'kick.com',
+        #     'method': 'POST',
+        #     'path': '/api/v1/signup/send/email',
+        #     'scheme': 'https',
+        #     'accept': 'application/json, text/plain, */*',
+        #     'accept-encoding': 'gzip, deflate, br, zstd',
+        #     'accept-language': 'en',
+        #     "X-Requested-With": "XMLHttpRequest",
+        #     'authorization': f'Bearer {XSRF}',
+        #     'content-length': str(len(payload)),
+        #     'content-type': 'application/json',
+        #     'cookie': self.headersCookies(),
+        #     'origin': 'https://kick.com',
+        #     'referer': 'https://kick.com/',
+        #     'sec-ch-ua': '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+        #     'sec-ch-ua-Arch': '"x86"',
+        #     'sec-ch-ua-Bitness': '"64"',
+        #     'sec-ch-ua-Full-Version': '"122.0.6261.131"',
+        #     'sec-ch-ua-Full-Version-List': '"Chromium";v="122.0.6261.131", "Not(A:Brand";v="24.0.0.0", "Google Chrome";v="122.0.6261.131"',
+        #     'sec-ch-ua-Mobile': '?0',
+        #     'sec-ch-ua-Model': '""',
+        #     'sec-ch-ua-Platform': '"Windows"',
+        #     'sec-ch-ua-Platform-Version': '"6.0.0"',
+        #     'sec-fetch-dest': 'empty',
+        #     'sec-fetch-mode': 'cors',
+        #     'sec-fetch-site': 'same-origin',
+        #     'user-agent': self.ua,
+        #     'x-kpsdk-cd': solveKasada["x-kpsdk-cd"],
+        #     'x-kpsdk-ct': solveKasada["x-kpsdk-ct"],
+        #     'x-kpsdk-v': 'j-0.0.0',
+        #     'x-socket-id': socket_id,
+        #     'x-xsrf-token': XSRF,
+        # }
         headers = {
             'content-length':str(len(payload)),
             'sec-ch-ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
@@ -175,13 +215,14 @@ class kick:
         try:
             sendCode = self.checkError(self.client.post('https://kick.com/api/v1/signup/send/email', headers=headers, data=payload, proxy=self.proxies, timeout_seconds=self.timeout))
             if "The browser is not supported" in sendCode.text:
-                while True:
-                    self.newClient = tls_client.Session(client_identifier="chrome_122", random_tls_extension_order=True, ja3_string=",".join(["771", "-".join([str(random.randint(0, 255)) for _ in range(150)]), "0-10-11-35-23-65281-13-5-18-16-30032-43", "23-24-25", "0-1-2"]))
-                    sendCode = self.checkError(self.newClient.post('https://kick.com/api/v1/signup/send/email', headers=headers, data=payload, proxy=self.proxies, timeout_seconds=self.timeout))
-                    if sendCode.status_code == 200:
-                        self.newClient.cookies.update(self.client.cookies)
-                        self.client = self.newClient
-                        break
+                input(sendCode.json())
+                # while True:
+                #     self.newClient = tls_client.Session(client_identifier="chrome_122", random_tls_extension_order=True, ja3_string=",".join(["771", "-".join([str(random.randint(0, 255)) for _ in range(150)]), "0-10-11-35-23-65281-13-5-18-16-30032-43", "23-24-25", "0-1-2"]))
+                #     sendCode = self.checkError(self.newClient.post('https://kick.com/api/v1/signup/send/email', headers=headers, data=payload, proxy=self.proxies, timeout_seconds=self.timeout))
+                #     if sendCode.status_code == 200:
+                #         self.newClient.cookies.update(self.client.cookies)
+                #         self.client = self.newClient
+                #         break
         except tls_exceptions.TLSClientExeption as err:
             sys.exit(console.error("Probably dead proxy" + str(err)))
         self.updateHeaders()
@@ -271,8 +312,10 @@ class kick:
             console.success(f"Account created | Username: {self.username}")
             if self.follow: # Todo
                 for follow in self.follow:
-                    solveKasada = salamoonder(self.pjs)
-                    # solveKasada = kasada(self.pjs, f"/api/v2/channels/{follow}/follow")
+                    if self.useSalamoonder:
+                        solveKasada = salamoonder(self.pjs)
+                    else:
+                        solveKasada = kasada(self.pjs, f"/api/v2/channels/{follow}/follow")
                     headers = {
                         'Host': 'kick.com',
                         'x-kpsdk-cd': solveKasada["x-kpsdk-cd"],
