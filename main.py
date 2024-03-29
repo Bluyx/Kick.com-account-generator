@@ -143,7 +143,7 @@ def genWithThreads():
         for acc in range(settings["AccountsCount"]):
             username = ""
             while len(username) > 25 or len(username) == 0:
-                username = f"{generate_word(random.choice(["adj", "noun", "verb"]))}{random.choice(['_', ''])}{generate_word(random.choice(["adj", "noun", "verb"]))}{random.choice(['_', ''])}{str(random.randint(1, 99999))}"
+                username = f'{generate_word(random.choice(["adj", "noun", "verb"]))}{random.choice(["_", ""])}{generate_word(random.choice(["adj", "noun", "verb"]))}{random.choice(["_", ""])}{str(random.randint(1, 99999))}'
     elif settings["usernamesType"] == 2:
         usernameLength = int(input("What length would you prefer for the random username? "))
         if usernameLength < 4:
