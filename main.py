@@ -1,4 +1,4 @@
-import kick, sys, random, string, re, nltk, pickle, better_profanity, json, console, concurrent.futures
+import sys, random, string, re, nltk, pickle, better_profanity, json, console, concurrent.futures
 
 
 print("\nKick.com account generater - https://github.com/Bluyx - Discord: 2yv\n\n")
@@ -31,9 +31,12 @@ else:
     print("[1] Realistic usernames")
     print("[2] Random usernames")
     print(f"[3] Choose a name and add numbers from 0 to {accCount} for each username")
-    print("[4] Random username from txt file")
+    print("[4] Usernames from txt file")
     usernamesType = int(input())
     if usernamesType not in [1,2,3, 4]: sys.exit(console.error("Invalid choice"))
+    if usernamesType == 4:
+        usernamesTxt = input("Enter the txt file path: ")
+        settings["usernamesTxt"] = usernamesTxt
     settings["usernamesType"] = usernamesType
     print("Select how you would like the passwords for the accounts")
     print("[1] Random password for each account")
@@ -81,6 +84,7 @@ else:
     with open("config.json", "w") as f:
         json.dump({"settings": settings, "kopeechka": config["kopeechka"], "salamoonder_apiKey": salamoonder_apiKey, "apiURL": config["apiURL"], "imap": config["imap"], "domain": config["domain"]}, f, indent=4)
         print("Settings saved to config.json")
+import kick
 def generate(username):
     if settings["passwordsType"] == 1:
         pw = "".join(random.choice(string.ascii_letters + string.digits) for x in range(8)) + random.choice([char for char in """!@#$%^&*()-=_+|;:",.<>?'"""]) + random.choice(string.digits) # In case the random password is generated without a digit :)
@@ -143,7 +147,7 @@ def genWithThreads():
         for acc in range(settings["AccountsCount"]):
             username = ""
             while len(username) > 25 or len(username) == 0:
-                username = f"{generate_word(random.choice(["adj", "noun", "verb"]))}{random.choice(['_', ''])}{generate_word(random.choice(["adj", "noun", "verb"]))}{random.choice(['_', ''])}{str(random.randint(1, 99999))}"
+                username = f'{generate_word(random.choice(["adj", "noun", "verb"]))}{random.choice(["_", ""])}{generate_word(random.choice(["adj", "noun", "verb"]))}{random.choice(["_", ""])}{str(random.randint(1, 99999))}'
     elif settings["usernamesType"] == 2:
         usernameLength = int(input("What length would you prefer for the random username? "))
         if usernameLength < 4:
@@ -158,7 +162,7 @@ def genWithThreads():
             username = f"{username}{acc}"
         pass
     elif settings["usernamesType"] == 4:
-        usernamesTxt = input("enter the usernames txt file: ")
+        usernamesTxt = settings["usernamesTxt"] = usernamesTxt
         with open(usernamesTxt, "r") as f:
             usernames = usernamesTxt.readlines()
         for acc in range(accCount):
@@ -169,8 +173,6 @@ def genWithThreads():
         futures = [executor.submit(generate, username) for _ in range(settings["AccountsCount"])]
         for future in concurrent.futures.as_completed(futures):
             future.result()
-        # for _ in range(settings["AccountsCount"]):
-        #     executor.submit(generate, username).result()
 
 if settings["usernamesType"] != 4: genWithThreads()
 

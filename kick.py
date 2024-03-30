@@ -15,18 +15,20 @@ class kick:
         self.saveAs = saveAs
         self.useKopeechka = useKopeechka
         self.imap = imap
-        self.useSalamoonder = True
+        self.useSalamoonder = False
         if proxies:
             self.proxies = f"http://{random.choice(proxies).strip()}"
         self.debug = debug
         self.optionalRequests = optionalRequests # Todo
         self.follow = follow
         self.client = tls_client.Session(
-            client_identifier="chrome_122",
+            client_identifier="chrome_120",
             random_tls_extension_order=True,
-            ja3_string=",".join(["772", "-".join([str(random.randint(50, 52392)) for _ in range(15)]), "-".join("45-16-23-65281-35-65037-51-10-43-13-17513-5-0-11-18-27".split("-")), "29-23-24,0"])
+            # ja3_string="771,4865-4867-4866-49195-49199-52393-52392-49196-49200-49162-49161-49171-49172-156-157-47-53,0-23-65281-10-11-16-5-34-51-43-13-28-65037,29-23-24-25-256-257,0"
+            ja3_string=",".join(["771", "-".join([str(random.randint(50, 52392)) for _ in range(15)]), "-".join("45-16-23-65281-35-65037-51-10-43-13-17513-5-0-11-18-27".split("-")), "29-23-24,0"])
         )
-        self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0"
+        # self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
         # self.ua = "Mozilla_5_0_Macintosh_Intel_Mac_OS_X_14_1_AppleWebKit_537_36_KHTML_like_Gecko_Chrome_120_0_0_0_Safari_537_36"
         home = self.client.get("https://kick.com/", headers={
             "authority": "kick.com",
@@ -109,7 +111,7 @@ class kick:
         headersCookies = ""
         for name, value in self.client.cookies.items():
             headersCookies = headersCookies + f"{name}={value}; "
-        return headersCookies[:-1]
+        return headersCookies[:-2]
 
     def updateHeaders(self):
         XSRF = self.client.cookies["XSRF-TOKEN"].replace("%3D", "=")
@@ -183,6 +185,12 @@ class kick:
         #     'x-socket-id': socket_id,
         #     'x-xsrf-token': XSRF,
         # }
+
+        self.client.cookies.set("KP_UIDz-ssn", solveKasada["x-kpsdk-ct"])
+        self.client.cookies.set("KP_UIDz", solveKasada["x-kpsdk-ct"])
+        # kasadaCookies = solveKasada["cookies"].split(";")
+        # for kasadaCookie in kasadaCookies:
+        #     self.client.cookies.set(kasadaCookie.split("=")[0], kasadaCookie.split("=")[1])
         headers = {
             'content-length':str(len(payload)),
             'sec-ch-ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',

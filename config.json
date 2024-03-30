@@ -1,7 +1,8 @@
 {
     "settings": {
         "AccountsCount": 1,
-        "usernamesType": 1,
+        "usernamesTxt": null,
+        "usernamesType": 4,
         "follow": [
             "xqc"
         ],
