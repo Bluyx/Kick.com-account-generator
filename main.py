@@ -109,71 +109,72 @@ def generate(username):
         proxies=proxies,
         saveAs=settings["saveAs"]
         ).create_account()
-
-def genWithThreads():
-    if settings["usernamesType"] == 1:
+def realisticUsername():
+    try:
+        nltk.corpus.wordnet.synsets("cat")
+    except:
+        console.info("Downloading WordNet dataset...")
+        nltk.download("wordnet")
+        console.success("WordNet dataset downloaded successfuly")
+    def generate_word(pos):
         try:
-            nltk.corpus.wordnet.synsets("cat")
-        except:
-            console.info("Downloading WordNet dataset...")
-            nltk.download("wordnet")
-            console.success("WordNet dataset downloaded successfuly")
-        def generate_word(pos):
-            try:
-                with open(f"{pos}_list.pkl", "rb") as file:
-                    words = pickle.load(file)
-            except FileNotFoundError:
-                pos_tag = getattr(nltk.corpus.wordnet, pos.upper())
-                words = [word for word in nltk.corpus.wordnet.words() if nltk.corpus.wordnet.synsets(word, pos=pos_tag)]
-                with open(f"{pos}_list.pkl", "wb") as file:
-                    pickle.dump(words, file)
+            with open(f"{pos}_list.pkl", "rb") as file:
+                words = pickle.load(file)
+        except FileNotFoundError:
+            pos_tag = getattr(nltk.corpus.wordnet, pos.upper())
+            words = [word for word in nltk.corpus.wordnet.words() if nltk.corpus.wordnet.synsets(word, pos=pos_tag)]
+            with open(f"{pos}_list.pkl", "wb") as file:
+                pickle.dump(words, file)
 
-            try:
-                with open(f"{pos}_cache.pkl", "rb") as file:
-                    filtered_words = pickle.load(file)
-            except FileNotFoundError:
-                console.info("Collecting valid usernames. This might take a while, and it's only for one time")
-                filtered_words = [
-                    word for word in words
-                    if len(word) <= 7 and not better_profanity.profanity.contains_profanity(word) and not bool(re.search(r"[^a-zA-Z0-9]", word))
-                ]
-                with open(f"{pos}_cache.pkl", "wb") as file:
-                    pickle.dump(filtered_words, file)
-            if not filtered_words:
-                raise ValueError("No random word found")
+        try:
+            with open(f"{pos}_cache.pkl", "rb") as file:
+                filtered_words = pickle.load(file)
+        except FileNotFoundError:
+            console.info("Collecting valid usernames. This might take a while, and it's only for one time")
+            filtered_words = [
+                word for word in words
+                if len(word) <= 7 and not better_profanity.profanity.contains_profanity(word) and not bool(re.search(r"[^a-zA-Z0-9]", word))
+            ]
+            with open(f"{pos}_cache.pkl", "wb") as file:
+                pickle.dump(filtered_words, file)
+        if not filtered_words:
+            raise ValueError("No random word found")
 
-            return random.choice(filtered_words).capitalize()
-        
-        for acc in range(settings["AccountsCount"]):
-            username = ""
-            while len(username) > 25 or len(username) == 0:
-                username = f'{generate_word(random.choice(["adj", "noun", "verb"]))}{random.choice(["_", ""])}{generate_word(random.choice(["adj", "noun", "verb"]))}{random.choice(["_", ""])}{str(random.randint(1, 99999))}'
-    elif settings["usernamesType"] == 2:
+        return random.choice(filtered_words).capitalize()
+    
+    username = ""
+    while len(username) > 25 or len(username) == 0:
+        username = f'{generate_word(random.choice(["adj", "noun", "verb"]))}{random.choice(["_", ""])}{generate_word(random.choice(["adj", "noun", "verb"]))}{random.choice(["_", ""])}{str(random.randint(1, 99999))}'
+    return username
+def randomUsername():
         usernameLength = int(input("What length would you prefer for the random username? "))
         if usernameLength < 4:
             sys.exit(console.error("username must be at least 4 characters."))
-        for acc in range(accCount):
-            username = "".join(random.choice(string.ascii_lowercase + string.digits) for x in range(usernameLength))
-    elif settings["usernamesType"] == 3:
-        username = input("Enter the username you want: ")
-        for acc in range(accCount):
-            if len(username) < 3: # Because there is numbers will be added to the username
-                sys.exit(console.error("username must be at least 3 characters."))
-            username = f"{username}{acc}"
-        pass
-    elif settings["usernamesType"] == 4:
-        usernamesTxt = settings["usernamesTxt"] = usernamesTxt
-        with open(usernamesTxt, "r") as f:
-            usernames = usernamesTxt.readlines()
-        for acc in range(accCount):
-            generate(usernames[acc])
-    else:
-        sys.exit(console.error("Invalid choice"))
+        return "".join(random.choice(string.ascii_lowercase + string.digits) for x in range(usernameLength))
+def customUsername():
+    username = input("Enter the username you want: ")
+    if len(username) < 3: # Because there is numbers will be added to the username
+        sys.exit(console.error("username must be at least 3 characters."))
+    return username
+def genWithThreads():
     with concurrent.futures.ThreadPoolExecutor(max_workers=settings["threads"]) as executor:
-        futures = [executor.submit(generate, username) for _ in range(settings["AccountsCount"])]
+        futures = []
+        for _ in range(settings["AccountsCount"]):
+            if settings["usernamesType"] == 1:
+                username = realisticUsername()
+            elif settings["usernamesType"] == 2:
+                username = randomUsername()
+            elif settings["usernamesType"] == 3:
+                username = customUsername()
+            elif settings["usernamesType"] == 4:
+                with open(settings["usernamesTxt"], "r") as f:
+                    usernames = f.readlines()
+                username = usernames[_]
+            else:
+                sys.exit(console.error("Invalid choice"))
+            futures.append(executor.submit(generate, username))
         for future in concurrent.futures.as_completed(futures):
             future.result()
 
-if settings["usernamesType"] != 4: genWithThreads()
-
+genWithThreads()
 console.success("Done. Accounts have been generated")

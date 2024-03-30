@@ -15,7 +15,7 @@ class kick:
         self.saveAs = saveAs
         self.useKopeechka = useKopeechka
         self.imap = imap
-        self.useSalamoonder = False
+        self.useSalamoonder = True
         if proxies:
             self.proxies = f"http://{random.choice(proxies).strip()}"
         self.debug = debug

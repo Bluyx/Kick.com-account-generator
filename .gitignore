@@ -10,3 +10,4 @@ noun_cache.pkl
 verb_cache.pkl
 verb_list.pkl
 proxies.txt
+config.json

@@ -14,13 +14,13 @@
         "saveAs": 3
     },
     "kopeechka": {
-        "kopeechkaToken": "4ec5d7ed2ffa4a3afbd321960a643dcc",
+        "kopeechkaToken": "",
         "domains": [
             "hotmail.com",
             "outlook.com"
         ]
     },
-    "salamoonder_apiKey": "sr-egemen-e3e1-a193-6061-4ca6a81b",
+    "salamoonder_apiKey": "",
     "apiURL": "http://mail.example.com",
     "imap": "mail.example.com",
     "domain": "example.com"
