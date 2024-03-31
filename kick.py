@@ -21,20 +21,20 @@ class kick:
         self.debug = debug
         self.optionalRequests = optionalRequests # Todo
         self.follow = follow
+        self.chromeVersion = "120"
         self.client = tls_client.Session(
-            client_identifier="chrome_120",
+            client_identifier=f"chrome{self.chromeVersion}",
             random_tls_extension_order=True,
             # ja3_string="771,4865-4867-4866-49195-49199-52393-52392-49196-49200-49162-49161-49171-49172-156-157-47-53,0-23-65281-10-11-16-5-34-51-43-13-28-65037,29-23-24-25-256-257,0"
             ja3_string=",".join(["771", "-".join([str(random.randint(50, 52392)) for _ in range(15)]), "-".join("45-16-23-65281-35-65037-51-10-43-13-17513-5-0-11-18-27".split("-")), "29-23-24,0"])
         )
-        self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0"
-        # self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-        # self.ua = "Mozilla_5_0_Macintosh_Intel_Mac_OS_X_14_1_AppleWebKit_537_36_KHTML_like_Gecko_Chrome_120_0_0_0_Safari_537_36"
+        # self.client.proxies = self.proxies
+        self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
         home = self.client.get("https://kick.com/", headers={
             "authority": "kick.com",
             "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
             "accept-language": "en-US,en;q=0.9,ar;q=0.8",
-            "sec-ch-ua": '"Not.A/Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+            "sec-ch-ua": f'"Not.A/Brand";v="8", "Chromium";v="{self.chromeVersion}", "Google Chrome";v="{self.chromeVersion}"',
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": '"Windows"',
             "sec-fetch-dest": "document",
@@ -50,7 +50,7 @@ class kick:
             "accept": "application/json, text/plain, */*",
             "accept-language": "en-US",
             "referer": "https://kick.com/",
-            "sec-ch-ua": '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
+            "sec-ch-ua": f'"Not.A/Brand";v="8", "Chromium";v="{self.chromeVersion}", "Google Chrome";v="{self.chromeVersion}"',
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": '"Windows"',
             "sec-fetch-dest": "empty",
@@ -83,7 +83,7 @@ class kick:
             "authorization": f"Bearer {self.client.cookies['XSRF-TOKEN'].replace('%3D', '=')}",
             "cookie": self.headersCookies(),
             "referer": "https://kick.com/",
-            "sec-ch-ua": '"Chromium";v="120", "Not(A:Brand";v="24", "Google Chrome";v="120"',
+            "sec-ch-ua": f'"Chromium";v="{self.chromeVersion}", "Not(A:Brand";v="{self.chromeVersion[1:]}", "Google Chrome";v="{self.chromeVersion}"',
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": '"Windows"',
             "sec-fetch-dest": "empty",
@@ -149,88 +149,38 @@ class kick:
             solveKasada = salamoonder(self.pjs)
         else:
             solveKasada = kasada(self.pjs, "/api/v1/signup/send/email")
-        XSRF = self.client.cookies["XSRF-TOKEN"].replace("%3D", "=")
-        payload = json.dumps({"email":self.email})
-        # headers = {
-        #     'authority': 'kick.com',
-        #     'method': 'POST',
-        #     'path': '/api/v1/signup/send/email',
-        #     'scheme': 'https',
-        #     'accept': 'application/json, text/plain, */*',
-        #     'accept-encoding': 'gzip, deflate, br, zstd',
-        #     'accept-language': 'en',
-        #     "X-Requested-With": "XMLHttpRequest",
-        #     'authorization': f'Bearer {XSRF}',
-        #     'content-length': str(len(payload)),
-        #     'content-type': 'application/json',
-        #     'cookie': self.headersCookies(),
-        #     'origin': 'https://kick.com',
-        #     'referer': 'https://kick.com/',
-        #     'sec-ch-ua': '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
-        #     'sec-ch-ua-Arch': '"x86"',
-        #     'sec-ch-ua-Bitness': '"64"',
-        #     'sec-ch-ua-Full-Version': '"122.0.6261.131"',
-        #     'sec-ch-ua-Full-Version-List': '"Chromium";v="122.0.6261.131", "Not(A:Brand";v="24.0.0.0", "Google Chrome";v="122.0.6261.131"',
-        #     'sec-ch-ua-Mobile': '?0',
-        #     'sec-ch-ua-Model': '""',
-        #     'sec-ch-ua-Platform': '"Windows"',
-        #     'sec-ch-ua-Platform-Version': '"6.0.0"',
-        #     'sec-fetch-dest': 'empty',
-        #     'sec-fetch-mode': 'cors',
-        #     'sec-fetch-site': 'same-origin',
-        #     'user-agent': self.ua,
-        #     'x-kpsdk-cd': solveKasada["x-kpsdk-cd"],
-        #     'x-kpsdk-ct': solveKasada["x-kpsdk-ct"],
-        #     'x-kpsdk-v': 'j-0.0.0',
-        #     'x-socket-id': socket_id,
-        #     'x-xsrf-token': XSRF,
-        # }
-
         self.client.cookies.set("KP_UIDz-ssn", solveKasada["x-kpsdk-ct"])
         self.client.cookies.set("KP_UIDz", solveKasada["x-kpsdk-ct"])
+        XSRF = self.client.cookies["XSRF-TOKEN"].replace("%3D", "=")
+        payload = json.dumps({"email":self.email})
         # kasadaCookies = solveKasada["cookies"].split(";")
         # for kasadaCookie in kasadaCookies:
         #     self.client.cookies.set(kasadaCookie.split("=")[0], kasadaCookie.split("=")[1])
         headers = {
-            'content-length':str(len(payload)),
-            'sec-ch-ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
-            'x-xsrf-token':XSRF,
+            'accept': 'application/json, text/plain, */*',
+            'accept-language': 'en-US',
+            'authorization': f'Bearer {XSRF}',
+            'content-type': 'application/json',
+            'cookie': self.headersCookies(),#'_gcl_au=1.1.1863589521.1711713303; _ga=GA1.1.1068864705.1711713307; _fbp=fb.1.1711713309821.714979569; __stripe_mid=80ed6123-cb6f-4bb1-a319-ab5e9ea3f278509849; _rdt_uuid=1711712475057.a880b5bb-243b-40ba-845e-fe01be9546bb; __cf_bm=z0x_juySgj3xDYv4H.TBMZOSxmfzlz6ljRG8dtlxOic-1711853111-1.0.1.1-HfG5IGTdkugtPjoNchJlDrSv5ZYsEGk_ml0N7QYd9rVnbJnK06nChrqohW.2qO3CqMhXToFW3blZN6UIt2UBlw; cf_clearance=LBgk2L.NRa6Uju0LM.JZ7swUbzdu68OnLy66b.n7_ak-1711853112-1.0.1.1-P4gLNOn6KEQUr.L2ePJVEq7gpXb1VYwhD.pXHgFeBfzmJ4KMrLqSj71JRRGbbaA9t6HsnvYQvGb5TBuEams7RQ; KP_UIDz-ssn=02AZKHNhRRcehfM9k5M246ZSm1uhwiBeGF1J3E4Zl7tkjoxerGw2w8DIha4mBYTsk435uVd3eu1racj0ZWtbZzQ4FKroHNZZqhZch5KpT4261SP7ZWB77hoqCgaZvenZytzwXerauCWpOzkudllQaJ2jFpg5Wfu9W5PbsR; KP_UIDz=02AZKHNhRRcehfM9k5M246ZSm1uhwiBeGF1J3E4Zl7tkjoxerGw2w8DIha4mBYTsk435uVd3eu1racj0ZWtbZzQ4FKroHNZZqhZch5KpT4261SP7ZWB77hoqCgaZvenZytzwXerauCWpOzkudllQaJ2jFpg5Wfu9W5PbsR; _ga_JPX1B65FL2=GS1.1.1711853116.3.0.1711853117.59.0.0; __stripe_sid=713400cc-861f-47bd-856e-360ef95dc2568426bd; m731jemIS739N9Zu67J4zGVzawkWI9IOMsCOhMyM=eyJpdiI6InpJSm90R3NXZlBHY21uMzd3azA3cHc9PSIsInZhbHVlIjoiUDRxdlIzb0dmSU5zTWlRRmdadW1aeUdFaiszYklKc0Q3ckR1OC95U1UxRStKbDhCWkJKZE9YVkdWNDdPcVRQSW9XbFI0L1ZxMmJiL0FTTlNYZ0w3RXBZSi8rVzlNTmpHdTROZ0hSU1A3Tmg2VVVreUhtYkNzeC9IbkR5VFZxQUdSQlV0aEdMdFR4Z1pKNVpRVzU5UEFySE16LzA3VXVlQkFUci9UNnJSdlJaaW1lSytFOVBTRXcvbzRpbkMzU204NzJPL2EyNzNlZzhQU1E3bjhMVkh1UnV3U0ltQXI2VWxaWEdMUDNSdTBNNHQ3ZjFuYXVPVUhsU0hJYzZ5SkRrcHpjWEpZT0tpaTQyUmlaWEpqSjRSYzF1RVF6OHJ2akttU3BGeGE1eFdCaTV4S0tVQzJMYVJLNnBFdWVkZUg5bGp2Rk5qZUU3a3cxTFZlcjNCYldZNnVYZFBxOE8zVTFHdy9DQ2Q2WTVTMFBtRWNQR0FwdUVoUVlUOFQ1Q2FkcFhWVW9NVERPMnltZzhKQmp0Nm43MjJDckVZUzcvay9yRWZhQXRiZU5aUHpDZz0iLCJtYWMiOiJjZGMzZDA3MDE0ZjU3NGZjMWRjNWZiNTEyNjQ3YTFhMjY3YjdkNzYxZWUyOTIyMjViOWJhZGIwZmQ2MTQ4NmRmIiwidGFnIjoiIn0%3D; XSRF-TOKEN=eyJpdiI6IlJ6a2hIcWlqdEx3ZXFZYTl2VGJ1NFE9PSIsInZhbHVlIjoiNS8wZ2IyRXlZTkJ3UW9NcUtlQWs1Y3NrbWdnWVhxWlZJS3F1QlBMLzY0M25rRU9IbTVZL3ZIdjlYVTFvdXBFTUUzdW04U2N5Umk4eTFWSzZaSnp3Z2Y4UDRLMDhYTWtzZkdEWFgrZkg0MFc1VHVMSEZ1Uktpbm5DVWtpU0U4Vk4iLCJtYWMiOiIyOWFiODQ2YzFhOGRjZWQ1NDc0MjM4NzkwY2E4NjM4MTFlYWE0ODNjODRmM2NmYTFkYzU0ZGFmYjBkY2RjMzIzIiwidGFnIjoiIn0%3D; kick_session=eyJpdiI6Ilh3VHZIRlZPTVgzT3B3YzMrb3J1MFE9PSIsInZhbHVlIjoiNDV3WE9jSVo0Qlh4eS91dUJrTVc5d3VQSVZydjdpYXdDeWNzd3NQTVpoTXAvellZME53Q1NLa2Q3RitzZVA3S0R4azRMbXBRaGd6MElPMzd2NVhIV3U4YmlidWEza3liUTVBVGJralQra3FPR3RVanFDSE1VWU5HZUN4OU9YcnIiLCJtYWMiOiIwMTQ1NjgwYWZkOWU1ZmNjNjY2MTZlNmYwMmI0ZjdhZjU3Nzg4MDIwMTQ2YThlYzAxM2YxZjYzOTliY2U3NTVmIiwidGFnIjoiIn0%3D; _dd_s=rum=0&expire=1711854042378',
+            'origin': 'https://kick.com',
+            'referer': 'https://kick.com/',
+            'sec-ch-ua': f'"Google Chrome";v="{self.chromeVersion}", "Not:A-Brand";v="8", "Chromium";v="{self.chromeVersion}"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': self.ua,
             'x-kpsdk-cd': solveKasada["x-kpsdk-cd"],
-            'accept-language':'en-US',
-            'authorization':f'Bearer {XSRF}',
-            'sec-ch-ua-arch':'"x86"',
-            'x-socket-id':socket_id,
-            'sec-ch-ua-platform-version':'"12.0.0"',
-            'sec-ch-ua-full-version-list':'"Chromium";v="122.0.6261.129", "Not(A:Brand";v="24.0.0.0", "Google Chrome";v="122.0.6261.129"',
-            'x-kpsdk-v':'j-0.0.0',
-            'sec-ch-ua-model':'""',
-            'sec-ch-ua-bitness':'"64"',
-            'sec-ch-ua-platform':'"Windows"',
             'x-kpsdk-ct': solveKasada["x-kpsdk-ct"],
-            'sec-ch-ua-mobile':'?0',
-            'user-agent':self.ua,
-            'content-type':'application/json',
-            'sec-ch-ua-full-version':'"122.0.6261.129"',
-            'accept':'application/json, text/plain, */*',
-            'origin':'https://kick.com',
-            'sec-fetch-site':'same-origin',
-            'sec-fetch-mode':'cors',
-            'sec-fetch-dest':'empty',
-            'referer':'https://kick.com/',
-            'accept-encoding':'gzip, deflate, br, zstd',
-            'cookie': self.headersCookies()
+            'x-kpsdk-v': 'j-0.0.0',
+            'x-socket-id': socket_id,
+            'x-xsrf-token': XSRF,
         }
         try:
-            sendCode = self.checkError(self.client.post('https://kick.com/api/v1/signup/send/email', headers=headers, data=payload, proxy=self.proxies, timeout_seconds=self.timeout))
+            sendCode = self.checkError(self.client.post('https://kick.com/api/v1/signup/send/email', headers=headers, data=payload, timeout_seconds=self.timeout, proxy=self.proxies))
             if "The browser is not supported" in sendCode.text:
-                input(sendCode.json())
-                # while True:
-                #     self.newClient = tls_client.Session(client_identifier="chrome_122", random_tls_extension_order=True, ja3_string=",".join(["771", "-".join([str(random.randint(0, 255)) for _ in range(150)]), "0-10-11-35-23-65281-13-5-18-16-30032-43", "23-24-25", "0-1-2"]))
-                #     sendCode = self.checkError(self.newClient.post('https://kick.com/api/v1/signup/send/email', headers=headers, data=payload, proxy=self.proxies, timeout_seconds=self.timeout))
-                #     if sendCode.status_code == 200:
-                #         self.newClient.cookies.update(self.client.cookies)
-                #         self.client = self.newClient
-                #         break
+                input()
         except tls_exceptions.TLSClientExeption as err:
             sys.exit(console.error("Probably dead proxy" + str(err)))
         self.updateHeaders()
@@ -275,7 +225,7 @@ class kick:
         }
         headers = {
             'content-length':str(len(payload)),
-            'sec-ch-ua':'"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+            'sec-ch-ua':f'"Chromium";v="{self.chromeVersion}", "Not(A:Brand";v="{self.chromeVersion[1:]}", "Google Chrome";v="{self.chromeVersion}"',
             'x-xsrf-token':XSRF,
             'accept-language':'en-US',
             'sec-ch-ua-mobile':'?0',
@@ -298,8 +248,6 @@ class kick:
             register = self.checkError(self.client.post("https://kick.com/register", headers=self.headers, data=json.dumps(data), proxy=self.proxies, timeout_seconds=self.timeout))
             if register.status_code != 200:
                 # if register.json()["errors"]:
-                #     input(register.json())
-                #     input(data)
                 if register.json()["errors"]["username"][0] == "The username has already been taken":
                     self.username = self.username + str(random.randint(100, 9999))
                     data["username"] = self.username
@@ -307,9 +255,15 @@ class kick:
                     # if(register.status_code != 200):
                     #     input(register.json())
                     #     input(data)
-            self.token = register.json()["token"]
+                else:
+                    input(register.json())
+                    input(data)
+            try:
+                self.token = register.json()["token"]
+            except:
+                input*(register.json())
             self.created = True
-            console.success(f"Account registered | Token: {self.token}")
+            console.success(f"Account registered | Token: {self.token} | Username: {self.username}")
         except tls_exceptions.TLSClientExeption as err:
             sys.exit(console.error("Probably dead proxy" + str(err)))
         self.updateHeaders()
@@ -317,7 +271,6 @@ class kick:
         self.checkError(self.client.get('https://kick.com/emotes/xqc', headers=self.headers)) # Unlock account
         self.updateHeaders()
         if self.created:
-            console.success(f"Account created | Username: {self.username}")
             if self.follow: # Todo
                 for follow in self.follow:
                     if self.useSalamoonder:

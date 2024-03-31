@@ -5,3 +5,4 @@ tls_client
 websocket_client
 better_profanity
 nltk
+BeautifulSoup4

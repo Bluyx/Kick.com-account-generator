@@ -107,7 +107,8 @@ def generate(username):
         debug=True,
         follow=settings["follow"],
         proxies=proxies,
-        saveAs=settings["saveAs"]
+        saveAs=settings["saveAs"],
+        timeout=15
         ).create_account()
 def realisticUsername():
     try:

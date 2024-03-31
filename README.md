@@ -63,8 +63,9 @@ python main.py
 
 ## Todo List
 - Better UI
-- Make it follow channels of the user's choice after each account is created
 - Handle more errors
+- Make the code more readable
+- <del>Make it follow channels of the user's choice after each account is created</del> (Done)
 
 ## Contant
 - Discord: <a href="https://discord.com/users/251794521908576257">2yv</a>
