@@ -168,7 +168,7 @@ class kick:
             'Sec-Fetch-Mode': 'cors',
             'Sec-Fetch-Site': 'same-origin',
             'User-Agent': self.ua,
-            'X-Socket-ID': '162637.124238',
+            'X-Socket-ID': socket_id,
             'X-XSRF-TOKEN': XSRF,
             'accept-language': 'en-US',
             'sec-ch-ua': '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
