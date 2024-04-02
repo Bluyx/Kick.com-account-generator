@@ -12,7 +12,8 @@ def salamoonder(pjs):
         "api_key": apiKey,
         "task": {
             "type": "KasadaCaptchaSolver",
-            "pjs": pjs
+            "pjs": pjs,
+            "cdOnly": "false"
         }
     }), timeout=50000)
     if "1 second" in createTask.text:
@@ -34,7 +35,7 @@ def salamoonder(pjs):
                     sys.exit(console.error("Couldn't solve Kasada, contact salamoonder's support or use https://github.com/0x6a69616e/kpsdk-solver"))
             return res["solution"]
         time.sleep(1)
-# Using https://github.com/0x6a69616e/kpsdk-solver (doesn't work)
+# Using https://github.com/0x6a69616e/kpsdk-solver
 # git clone https://github.com/0x6a69616e/kpsdk-solver.git
 # cd kpsdk-solver
 # npm install && npm install express

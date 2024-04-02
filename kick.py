@@ -157,25 +157,26 @@ class kick:
         # for kasadaCookie in kasadaCookies:
         #     self.client.cookies.set(kasadaCookie.split("=")[0], kasadaCookie.split("=")[1])
         headers = {
-            'accept': 'application/json, text/plain, */*',
+            'Accept': 'application/json, text/plain, */*',
+            'Authorization': f'Bearer {XSRF}',
+            'Connection': 'keep-alive',
+            'Content-Type': 'application/json',
+            'Cookie': self.headersCookies(),
+            'Origin': 'https://kick.com',
+            'Referer': 'https://kick.com/',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-origin',
+            'User-Agent': self.ua,
+            'X-Socket-ID': '162637.124238',
+            'X-XSRF-TOKEN': XSRF,
             'accept-language': 'en-US',
-            'authorization': f'Bearer {XSRF}',
-            'content-type': 'application/json',
-            'cookie': self.headersCookies(),#'_gcl_au=1.1.1863589521.1711713303; _ga=GA1.1.1068864705.1711713307; _fbp=fb.1.1711713309821.714979569; __stripe_mid=80ed6123-cb6f-4bb1-a319-ab5e9ea3f278509849; _rdt_uuid=1711712475057.a880b5bb-243b-40ba-845e-fe01be9546bb; __cf_bm=z0x_juySgj3xDYv4H.TBMZOSxmfzlz6ljRG8dtlxOic-1711853111-1.0.1.1-HfG5IGTdkugtPjoNchJlDrSv5ZYsEGk_ml0N7QYd9rVnbJnK06nChrqohW.2qO3CqMhXToFW3blZN6UIt2UBlw; cf_clearance=LBgk2L.NRa6Uju0LM.JZ7swUbzdu68OnLy66b.n7_ak-1711853112-1.0.1.1-P4gLNOn6KEQUr.L2ePJVEq7gpXb1VYwhD.pXHgFeBfzmJ4KMrLqSj71JRRGbbaA9t6HsnvYQvGb5TBuEams7RQ; KP_UIDz-ssn=02AZKHNhRRcehfM9k5M246ZSm1uhwiBeGF1J3E4Zl7tkjoxerGw2w8DIha4mBYTsk435uVd3eu1racj0ZWtbZzQ4FKroHNZZqhZch5KpT4261SP7ZWB77hoqCgaZvenZytzwXerauCWpOzkudllQaJ2jFpg5Wfu9W5PbsR; KP_UIDz=02AZKHNhRRcehfM9k5M246ZSm1uhwiBeGF1J3E4Zl7tkjoxerGw2w8DIha4mBYTsk435uVd3eu1racj0ZWtbZzQ4FKroHNZZqhZch5KpT4261SP7ZWB77hoqCgaZvenZytzwXerauCWpOzkudllQaJ2jFpg5Wfu9W5PbsR; _ga_JPX1B65FL2=GS1.1.1711853116.3.0.1711853117.59.0.0; __stripe_sid=713400cc-861f-47bd-856e-360ef95dc2568426bd; m731jemIS739N9Zu67J4zGVzawkWI9IOMsCOhMyM=eyJpdiI6InpJSm90R3NXZlBHY21uMzd3azA3cHc9PSIsInZhbHVlIjoiUDRxdlIzb0dmSU5zTWlRRmdadW1aeUdFaiszYklKc0Q3ckR1OC95U1UxRStKbDhCWkJKZE9YVkdWNDdPcVRQSW9XbFI0L1ZxMmJiL0FTTlNYZ0w3RXBZSi8rVzlNTmpHdTROZ0hSU1A3Tmg2VVVreUhtYkNzeC9IbkR5VFZxQUdSQlV0aEdMdFR4Z1pKNVpRVzU5UEFySE16LzA3VXVlQkFUci9UNnJSdlJaaW1lSytFOVBTRXcvbzRpbkMzU204NzJPL2EyNzNlZzhQU1E3bjhMVkh1UnV3U0ltQXI2VWxaWEdMUDNSdTBNNHQ3ZjFuYXVPVUhsU0hJYzZ5SkRrcHpjWEpZT0tpaTQyUmlaWEpqSjRSYzF1RVF6OHJ2akttU3BGeGE1eFdCaTV4S0tVQzJMYVJLNnBFdWVkZUg5bGp2Rk5qZUU3a3cxTFZlcjNCYldZNnVYZFBxOE8zVTFHdy9DQ2Q2WTVTMFBtRWNQR0FwdUVoUVlUOFQ1Q2FkcFhWVW9NVERPMnltZzhKQmp0Nm43MjJDckVZUzcvay9yRWZhQXRiZU5aUHpDZz0iLCJtYWMiOiJjZGMzZDA3MDE0ZjU3NGZjMWRjNWZiNTEyNjQ3YTFhMjY3YjdkNzYxZWUyOTIyMjViOWJhZGIwZmQ2MTQ4NmRmIiwidGFnIjoiIn0%3D; XSRF-TOKEN=eyJpdiI6IlJ6a2hIcWlqdEx3ZXFZYTl2VGJ1NFE9PSIsInZhbHVlIjoiNS8wZ2IyRXlZTkJ3UW9NcUtlQWs1Y3NrbWdnWVhxWlZJS3F1QlBMLzY0M25rRU9IbTVZL3ZIdjlYVTFvdXBFTUUzdW04U2N5Umk4eTFWSzZaSnp3Z2Y4UDRLMDhYTWtzZkdEWFgrZkg0MFc1VHVMSEZ1Uktpbm5DVWtpU0U4Vk4iLCJtYWMiOiIyOWFiODQ2YzFhOGRjZWQ1NDc0MjM4NzkwY2E4NjM4MTFlYWE0ODNjODRmM2NmYTFkYzU0ZGFmYjBkY2RjMzIzIiwidGFnIjoiIn0%3D; kick_session=eyJpdiI6Ilh3VHZIRlZPTVgzT3B3YzMrb3J1MFE9PSIsInZhbHVlIjoiNDV3WE9jSVo0Qlh4eS91dUJrTVc5d3VQSVZydjdpYXdDeWNzd3NQTVpoTXAvellZME53Q1NLa2Q3RitzZVA3S0R4azRMbXBRaGd6MElPMzd2NVhIV3U4YmlidWEza3liUTVBVGJralQra3FPR3RVanFDSE1VWU5HZUN4OU9YcnIiLCJtYWMiOiIwMTQ1NjgwYWZkOWU1ZmNjNjY2MTZlNmYwMmI0ZjdhZjU3Nzg4MDIwMTQ2YThlYzAxM2YxZjYzOTliY2U3NTVmIiwidGFnIjoiIn0%3D; _dd_s=rum=0&expire=1711854042378',
-            'origin': 'https://kick.com',
-            'referer': 'https://kick.com/',
-            'sec-ch-ua': f'"Google Chrome";v="{self.chromeVersion}", "Not:A-Brand";v="8", "Chromium";v="{self.chromeVersion}"',
+            'sec-ch-ua': '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
             'sec-ch-ua-mobile': '?0',
             'sec-ch-ua-platform': '"Windows"',
-            'sec-fetch-dest': 'empty',
-            'sec-fetch-mode': 'cors',
-            'sec-fetch-site': 'same-origin',
-            'user-agent': self.ua,
             'x-kpsdk-cd': solveKasada["x-kpsdk-cd"],
             'x-kpsdk-ct': solveKasada["x-kpsdk-ct"],
             'x-kpsdk-v': 'j-0.0.0',
-            'x-socket-id': socket_id,
-            'x-xsrf-token': XSRF,
         }
         try:
             sendCode = self.checkError(self.client.post('https://kick.com/api/v1/signup/send/email', headers=headers, data=payload, timeout_seconds=self.timeout, proxy=self.proxies))
@@ -247,9 +248,8 @@ class kick:
         try:
             register = self.checkError(self.client.post("https://kick.com/register", headers=self.headers, data=json.dumps(data), proxy=self.proxies, timeout_seconds=self.timeout))
             if register.status_code != 200:
-                # if register.json()["errors"]:
                 if register.json()["errors"]["username"][0] == "The username has already been taken":
-                    self.username = self.username + str(random.randint(100, 9999))
+                    self.username = self.username.rstrip() + str(random.randint(100, 9999))
                     data["username"] = self.username
                     register = self.checkError(self.client.post("https://kick.com/register", headers=self.headers, data=json.dumps(data), proxy=self.proxies, timeout_seconds=self.timeout))
                     # if(register.status_code != 200):
