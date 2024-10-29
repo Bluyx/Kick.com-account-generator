@@ -1,7 +1,6 @@
 # Kick.com Account generator
 Kick Account generator
 
-⭐️
 ## Features
 - Fully based on Requests
 - Threads support
